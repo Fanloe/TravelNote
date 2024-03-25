@@ -2,7 +2,6 @@
 import {
   createBrowserRouter,
   RouterProvider,
-  Route,
   Outlet
 } from "react-router-dom";
 
@@ -13,10 +12,9 @@ import Register from "./pages/Register";
 import Detail from "./pages/Detail";
 import Personage from "./pages/Personage";
 import Bottom from "./components/Bottom";
-import Card from "./components/Card";
 import Top from "./components/Top";
 
-import './App.css';
+import './index.scss';
 
 
 const Layout = () => {
@@ -29,10 +27,40 @@ const Layout = () => {
   );
 }
 
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Layout />,
+    children: [
+      {
+        path: "/",
+        element: <Home />
+      },{
+        path: "/write",
+        element: <Write />
+      },{
+        path: "/personage",
+        element: <Personage />,
+      }
+    ]
+  },{
+    path: "/detail/:id",
+    element: <Detail />
+  },{
+    path: "/login",
+    element: <Login />
+  },{
+    path: "/register",
+    element: <Register />
+  }
+
+])
 function App() {
   return (
     <div className="App">
-      
+      <div className="container">
+        <RouterProvider router={router} />
+      </div>
     </div>
   );
 }
