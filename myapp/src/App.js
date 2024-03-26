@@ -36,13 +36,13 @@ const router = createBrowserRouter([
         path: "/",
         element: <Home />
       },{
-        path: "/write",
-        element: <Write />
-      },{
         path: "/personage",
         element: <Personage />,
       }
     ]
+  },{
+      path: "/write",
+      element: <Write />
   },{
     path: "/detail/:id",
     element: <Detail />
