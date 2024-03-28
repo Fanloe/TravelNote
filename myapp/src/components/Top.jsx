@@ -2,6 +2,8 @@
 // 页面顶部添加搜索功能，可通过游记标题，作者昵称搜索游记
 import React,{useState} from 'react';
 import { useLocation } from 'react-router-dom';
+import Title from './Title';
+
 import Searchicon from '../img/search.png';
 import { AudioOutlined } from '@ant-design/icons';
 import { Input, Space } from 'antd';
@@ -16,7 +18,8 @@ const Top = () => {
     })
     return (
         <div className='top'>
-            <div className='title'>TravelNote</div>
+            {/* <div className='title'>TravelNote</div> */}
+            <Title />
             {isHome && <div className='search' >
                 <Search
                     placeholder="键入搜索内容"

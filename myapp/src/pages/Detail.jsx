@@ -10,6 +10,8 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
+import Title from '../components/Title';
+
 import Goback from '../img/Goback.png'
 import Share from '../img/share.png'
 
@@ -39,7 +41,8 @@ const Detail = () => {
     }
     return (
         <div className='detail-page'>
-            <div className='title'>TravelNote</div>
+            {/* <div className='title'>TravelNote</div> */}
+            <Title />
             <div className='author-info'>
                 <div className='post-top' key={post.id}>
                     <div className="goback"  onClick={()=>navigate(-1)}>
