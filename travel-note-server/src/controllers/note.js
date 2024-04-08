@@ -17,14 +17,14 @@ const noteCollectionName = dbConfig.note;
 
 const addNote = async (req, res) => {
   try {
-    // console.log(req.query);
+    console.log(req.query);
     //pictures
     await upload(req, res);
     let picturesId = [];
-    req.files.forEach((picture) => {
-      //   console.log(picture.id.toString());
-      picturesId.push(picture.id.toString());
-    });
+    // req.files.forEach((picture) => {
+    //   //   console.log(picture.id.toString());
+    //   picturesId.push(picture.id.toString());
+    // });
 
     await client.connect();
     const db = client.db(dbName);
@@ -80,12 +80,12 @@ const getNotesByStatus = async (req, res) => {
 
     await client.connect();
     const db = client.db(dbName);
-    const collection = db.collection(userCollectionName);
-    const user = await collection.findOne({ username });
-    console.log(user);
-    const userId = user._id.toString();
-    // const noteIds = user.notes;
-    console.log(userId);
+    // const collection = db.collection(userCollectionName);
+    // const user = await collection.findOne({ username });
+    // console.log(user);
+    // const userId = user._id.toString();
+    // // const noteIds = user.notes;
+    // console.log(userId);
     // client.close();
 
     const noteTable = db.collection(noteCollectionName);

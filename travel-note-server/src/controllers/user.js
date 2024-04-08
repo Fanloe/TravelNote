@@ -30,39 +30,43 @@ const noteCollectionName = dbConfig.note;
  *添加数据到数据库
  */
 const insertOne = async (req, res) => {
-  // const { query } = req;
-  console.log(req);
-  // const username = query.username;
-  // const password = query.password;
+  const { query } = req;
+  // console.log(req);
+  const username = query.username;
+  const password = query.password;
+  console.log(req.query);
   // if(authority in query){
 
   // }
-  // const authority = query.authority;
-
-  // await client.connect();
-  // const db = client.db(dbName);
-  // const collection = db.collection(collectionName);
-  // const origin = await collection.find({ username });
-  // // console.log(origin);
-  // // Use connect method to connect to the server
-  // if (!origin) {
-  //   await collection.insertOne({ username, password, authority });
-  //   client.close();
-  //   res.status(200).json({
-  //     message: "Sign-up success",
-  //     user: {
-  //       name: username,
-  //       password: password,
-  //       authority: authority,
-  //     },
-  //   });
-  // } else {
-  //   client.close();
-  //   res.status(412).json({
-  //     message: "User already exists",
-  //     error: "User already exists",
-  //   });
-  // }
+  const authority = query.authority;
+  console.log("test");
+  await client.connect();
+  console.log("test");
+  const db = client.db(dbName);
+  console.log("test");
+  const collection = db.collection(collectionName);
+  const origin = await collection.find({ username });
+  // console.log(origin);
+  // Use connect method to connect to the server
+  console.log("test");
+  if (!origin) {
+    await collection.insertOne({ username, password, authority });
+    client.close();
+    res.status(200).json({
+      message: "Sign-up success",
+      user: {
+        name: username,
+        password: password,
+        authority: authority,
+      },
+    });
+  } else {
+    client.close();
+    res.status(412).json({
+      message: "User already exists",
+      error: "User already exists",
+    });
+  }
 };
 /**
  * 上传用户figure
@@ -280,7 +284,7 @@ const verifyNormalUser = async (req, res) => {
   const { query } = req;
   const username = query.username;
   const password = query.password;
-
+  console.log(username);
   await client.connect();
   const db = client.db(dbName);
   const collection = db.collection(collectionName);
