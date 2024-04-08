@@ -95,6 +95,7 @@ const download = async (req, res) => {
     });
 
     let downloadStream = bucket.openDownloadStreamByName(req.params.name);
+    console.log(req.params);
 
     downloadStream.on("data", function (data) {
       return res.status(200).write(data);
