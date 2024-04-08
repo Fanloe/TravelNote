@@ -1,0 +1,6 @@
+# Ignore artifacts:
+
+# Ignore all HTML files:
+/Users/zfliang/projects/TravelNote/travel-note-server/README.md
+/Users/zfliang/projects/TravelNote/README.md
+*README.md
