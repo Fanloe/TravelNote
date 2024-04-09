@@ -29,27 +29,30 @@ const noteCollectionName = dbConfig.note;
 /**
  *添加数据到数据库
  */
-const insertOne = async (req, res) => {
+const register = async (req, res) => {
   const { query } = req;
   // console.log(req);
   const username = query.username;
   const password = query.password;
-  console.log(req.query);
+  // console.log(req.query);
   // if(authority in query){
 
   // }
   const authority = query.authority;
-  console.log("test");
   await client.connect();
-  console.log("test");
   const db = client.db(dbName);
-  console.log("test");
   const collection = db.collection(collectionName);
-  const origin = await collection.find({ username });
-  // console.log(origin);
+  const origin = await collection.findOne({ username });
+  console.log(origin);
   // Use connect method to connect to the server
-  console.log("test");
-  if (!origin) {
+  // console.log("test");
+  if (origin) {
+    client.close();
+    res.status(412).json({
+      message: "User already exists",
+      error: "User already exists",
+    });
+  } else {
     await collection.insertOne({ username, password, authority });
     client.close();
     res.status(200).json({
@@ -59,12 +62,6 @@ const insertOne = async (req, res) => {
         password: password,
         authority: authority,
       },
-    });
-  } else {
-    client.close();
-    res.status(412).json({
-      message: "User already exists",
-      error: "User already exists",
     });
   }
 };
@@ -293,7 +290,7 @@ const verifyNormalUser = async (req, res) => {
   console.log(username);
   console.log(password);
   client.close();
-  if (user.password == password && user.authority == 0) {
+  if (user && user.password == password && user.authority == 0) {
     return res.status(200).json({
       message: "success",
       data: user,
@@ -335,7 +332,7 @@ const verifyAdministrator = async (req, res) => {
 
 //把方法暴露出去
 module.exports = {
-  insertOne,
+  register,
   getAllUser,
   // deleteMany,
   verifyNormalUser,

@@ -13,8 +13,9 @@ export const AuthContexProvider = ({ children }) => {
       `http://localhost:8080/verifyNormalUser?username=${inputs.username}&password=${inputs.password}`
     );
     // window.sessionStorage.setItem('accessToken', res.data.token)
-    console.log(res.data);
-    setCurrentUser(res.data);
+    console.log(res.data.data);
+    setCurrentUser(res.data.data);
+    //currentUser = {username,password,_id,authority}
   };
 
   const logout = async (inputs) => {

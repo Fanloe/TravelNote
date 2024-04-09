@@ -77,7 +77,7 @@ const getNotesByStatus = async (req, res) => {
     // console.log(username);
     // const statusOfNotes = 1;
     const statusOfNotes = req.query.status;
-
+    console.log(statusOfNotes);
     await client.connect();
     const db = client.db(dbName);
     // const collection = db.collection(userCollectionName);
@@ -89,8 +89,12 @@ const getNotesByStatus = async (req, res) => {
     // client.close();
 
     const noteTable = db.collection(noteCollectionName);
-    const array = await noteTable.find({ status: statusOfNotes }).toArray();
+    const array = await noteTable
+      .find({ status: Number(statusOfNotes) })
+      .toArray();
     console.log(array);
+    var newarray = [];
+    console.log(newarray);
     // await mongoClient.connect();
     client.close();
 
