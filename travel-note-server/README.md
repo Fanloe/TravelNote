@@ -30,6 +30,7 @@ note:
     - user._id
     - title
     - content
+    - date 
     - [pictures]: picture._id
     - status:
         {0: "未审核", Pending

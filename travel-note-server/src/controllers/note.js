@@ -25,7 +25,7 @@ const addNote = async (req, res) => {
     //   //   console.log(picture.id.toString());
     //   picturesId.push(picture.id.toString());
     // });
-
+    var updatedDate = new Date();
     await client.connect();
     const db = client.db(dbName);
     const userTable = db.collection(userCollectionName);
@@ -33,13 +33,15 @@ const addNote = async (req, res) => {
 
     const user = await userTable.findOne({ username: req.query.username });
     const userId = user._id.toString();
+    const username = req.query.username;
     const title = req.query.title;
     const content = req.query.content;
 
     const note = {
-      user: userId,
+      user: username,
       title: title,
       content: content,
+      date: updatedDate,
       pictures: picturesId,
       status: 0,
     };
@@ -77,7 +79,7 @@ const getNotesByStatus = async (req, res) => {
     // console.log(username);
     // const statusOfNotes = 1;
     const statusOfNotes = req.query.status;
-    console.log(statusOfNotes);
+    // console.log(statusOfNotes);
     await client.connect();
     const db = client.db(dbName);
     // const collection = db.collection(userCollectionName);
@@ -89,12 +91,18 @@ const getNotesByStatus = async (req, res) => {
     // client.close();
 
     const noteTable = db.collection(noteCollectionName);
-    const array = await noteTable
-      .find({ status: Number(statusOfNotes) })
-      .toArray();
-    console.log(array);
-    var newarray = [];
-    console.log(newarray);
+    const userTable = db.collection(userCollectionName);
+
+    let array = [];
+    array = await noteTable.find({ status: Number(statusOfNotes) }).toArray();
+    // .forEach(async (note) => {
+    //   // console.log(note);
+    //   console.log(note.user);
+    //   const user = await userTable.findOne({ _id: note.user });
+    //   console.log(user);
+    //   note.user = user.username;
+    // });
+    // console.log(array);
     // await mongoClient.connect();
     client.close();
 
@@ -130,7 +138,7 @@ const changeNoteStatus = async (req, res) => {
     const noteTable = db.collection(noteCollectionName);
     const note = await noteTable.findOne({ _id: noteId });
     console.log(note);
-    note.status = changeToStatus;
+    note.status = Number(changeToStatus);
 
     await noteTable.updateOne(
       { _id: noteId },
