@@ -13,7 +13,7 @@ let routes = (app) => {
   router.get("/files/:name", uploadController.download);
 
   router.get("/getalluser", userController.getAllUser);
-  router.get("/register", userController.insertOne);
+  router.get("/register", userController.register);
   router.get("/verifyNormalUser", userController.verifyNormalUser);
   router.post("/uploadUserFigure", userController.uploadUserFigure);
   router.get("/getUserFigure", userController.getUserFigure);

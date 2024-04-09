@@ -1,4 +1,51 @@
 # Node.js Upload multiple images to MongoDB example
+## server
+
+## Mongodb with pictures
+
+> [node-js-upload-image-mongodb](https://github.com/bezkoder/node-js-upload-image-mongodb) .
+> [upload/store images in MongoDB](https://www.bezkoder.com/node-js-upload-store-images-mongodb/) .
+
+- Project Setup: `npm install`
+- Run: `node src/server.js`
+
+> [Mongodb and VScode](https://code.visualstudio.com/docs/azure/mongodb)
+
+## schema
+user:
+    - user._id
+    - username
+    - password
+    - authority: 
+    {0: "普通用户",
+    1: "管理员",
+    2: "超级管理员"}
+    - figure: figure._id
+    - [notes]: note._id
+figures:
+    - _id
+    <!-- - user._id -->
+note:
+    - note._id
+    - user._id
+    - title
+    - content
+    - [pictures]: picture._id
+    - status:
+        {0: "未审核", Pending
+        1: "已通过",  Approved
+        2: "未通过",  Rejected
+        3: "已删除"}    Deleted
+pictures:
+    - pictures._id
+audit:
+    - audit._id
+    - user._id
+    - note._id
+    - time
+    - beforeStatus
+    - afterStatus
+
 
 For more detail, please visit:
 > [How to upload/store images in MongoDB using Node.js & Express](https://bezkoder.com/node-js-upload-multiple-images-mongodb/)

@@ -9,15 +9,19 @@ export const AuthContexProvider = ({ children }) => {
   );
 
   const login = async (inputs) => {
-    const res = await axios.post("/users/login", inputs);
-    window.sessionStorage.setItem('accessToken', res.data.token)
-    setCurrentUser(res.data);
+    const res = await axios.get(
+      `http://localhost:8080/verifyNormalUser?username=${inputs.username}&password=${inputs.password}`
+    );
+    // window.sessionStorage.setItem('accessToken', res.data.token)
+    console.log(res.data.data);
+    setCurrentUser(res.data.data);
+    //currentUser = {username,password,_id,authority}
   };
 
   const logout = async (inputs) => {
-    console.log(currentUser)
+    console.log(currentUser);
     const res = await axios.post("/users/logout");
-    console.log(res)
+    console.log(res);
     setCurrentUser(null);
   };
 

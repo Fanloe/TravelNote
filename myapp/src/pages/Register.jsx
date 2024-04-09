@@ -12,6 +12,7 @@ const Register = () => {
   const [inputs, setInputs] = useState({
     username: "",
     password: "",
+    authority:0
   });
   const [err, setError] = useState(null);
 
@@ -24,11 +25,11 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("/users/register", inputs);
-      navigate("/login");
+      await axios.get(`http://localhost:8080/register?username=${inputs.username}&password=${inputs.password}&authority=${inputs.authority}`);
     } catch (err) {
       setError(err.response.data);
     }
+    navigate("/login");
   };
 
   return (
