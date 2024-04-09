@@ -44,6 +44,7 @@ audit:
     - user._id
     - note._id
     - time
+    - opinion 
     - beforeStatus
     - afterStatus
 

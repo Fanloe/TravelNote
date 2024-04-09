@@ -14,15 +14,19 @@ const Login = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const handleChange = (e) => {
-    setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setInputs((prev) => ({ ...prev, [e.username]: e.password }));
   };
 
-  const onFinish = async (values) => {
+  const onFinish = async () => {
     try {
-      //const response = await axios.post('', inputs);
-      navigate('/home');
+      const response = await axios.get(`http://localhost:8080/verifyAdministrator?username=${inputs.username}&password=${inputs.password}`, inputs);
+      if(response.data.success){
+        navigate('/home');
+      }else{
+        setError(response.data.message);
+      }
     } catch (error) {
-      setError(error.response.data);
+      setError(error.response ? error.response.data : "..");
     }
   };
 
@@ -67,7 +71,7 @@ const Login = () => {
             />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" className="login-form-button">
+            <Button type="primary" htmlType="submit" className="login-form-button" >
               登录
             </Button>
           </Form.Item>

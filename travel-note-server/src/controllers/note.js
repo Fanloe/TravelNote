@@ -2,7 +2,7 @@ const dbConfig = require("../config/db");
 const upload = require("../middleware/mypicture");
 
 const url = dbConfig.url;
-console.log("userdb.js");
+console.log("note.js");
 //mongodb.js
 const { MongoClient, ObjectId } = require("mongodb");
 // Connection URL
@@ -218,6 +218,7 @@ const updateNote = async (req, res) => {
 
 const uploadFiles = async (req, res) => {
   try {
+    console.log(req);
     await upload(req, res);
     // console.log(req.files);
     req.files.forEach((picture) => {

@@ -5,6 +5,7 @@ module.exports = {
   mydb: "travelnotes",
   user: "user",
   note: "note",
+  audit: "audit",
   picBucket: "pictures",
   figBucket: "figures",
 };
