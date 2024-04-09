@@ -2,11 +2,13 @@
 // 对编辑内容做必须输入的校验，标题、内容、图片均为必须输入项
 // 实现发布功能，校验未通过出页面提示，
 // 通过后新增或更新游记内容到数据库，页面返回至「我的游记」页面并刷新
-import React,{useEffect,useState,useRef} from 'react';
+import React,{useEffect,useState,useRef,useContext} from 'react';
 import { useNavigate,useLocation } from 'react-router-dom';
 import {Editor} from '@tinymce/tinymce-react';
 import { PlusOutlined } from '@ant-design/icons';
 import { Modal, Upload } from 'antd';
+import axios from 'axios';
+import { AuthContext } from '../context/authContext';
 
 import Title from '../components/Title';
 
@@ -21,17 +23,24 @@ const getBase64 = (file) =>
   });
 
 const Write = () => {
+    const {currentUser} = useContext(AuthContext);
     let navigate = useNavigate();
     let location = useLocation();
     let data = location.state;
     const [post,setPost] = useState(data || {});
     const editorRef = useRef(null);
-    const log = () => {
+    const log = async () => {
         if(editorRef.current){
             console.log(editorRef.current.getContent());
             setPost({...post,content:editorRef.current.getContent()})
             console.log(post)
             // 调用后端传某用户的post
+            try{
+                const res = await axios.post(`http://localhost:8080/addNote?username=${currentUser.username}&title=${post.title}&content=${post.content}`)
+                console.log(res);
+            }catch(err){
+                console.log(err);
+            }
             // 成功后跳转至我的游记页面
             // 失败后页面提示
             navigate('/personage')
