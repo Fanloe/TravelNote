@@ -1,0 +1,61 @@
+
+.login-form{
+    max-width: 250;
+    margin: 'auto'; 
+    margin-top: 250;
+    background-color:'rgba(255, 255, 255, 0.8)';
+    padding: 30;
+    border-radius: 10;
+}
+
+.login-container{
+    background-image: url('../images/bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    height: 100vh;
+    overflow: hidden; 
+
+}
+
+.register-container{
+    background-image: url('../images/bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    height: 100vh;
+    overflow: hidden; 
+
+}
+
+.page-header{
+    color: rgb(255, 255, 255) !important;
+    padding: 30;
+}
+
+.header-title{
+    color:aliceblue;
+    font-style: normal;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.ant-page-header-heading-title{
+    color:aliceblue !important;
+}
+
+.ant-page-header-heading-sub-title{
+    color:aliceblue !important;
+}
+
+.ant-table-tbody {
+    background-color: #ffffff !important; 
+  }
+
+.custom-search input {
+    background-color: #f4f5f8 !important;
+  }
+
+.demo-logo-vertical{
+    padding: 30;
+}
