@@ -14,7 +14,14 @@ const corsOptions = {
 };
 // app.use(cors(corsOptions));
 app.use(cors(corsOptions));
+const bodyParser = require("body-parser");
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+); //解析post请求数据
 app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json()); //数据JSON类型
 initRoutes(app);
 
 let port = 8080;
