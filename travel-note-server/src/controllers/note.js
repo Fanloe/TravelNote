@@ -14,6 +14,7 @@ const GridFSBucket = require("mongodb").GridFSBucket;
 const dbName = dbConfig.mydb;
 const userCollectionName = dbConfig.user;
 const noteCollectionName = dbConfig.note;
+const auditCollectionName = dbConfig.audit;
 
 const addNote = async (req, res) => {
   try {
@@ -69,6 +70,40 @@ const addNote = async (req, res) => {
     return res.send({
       message: "Error adding note",
       error: error.message,
+    });
+  }
+};
+
+const getNoteByUsername = async (req, res) => {
+  try {
+    const username = req.query.username;
+
+    await client.connect();
+    const db = client.db(dbName);
+    const noteTable = db.collection(noteCollectionName);
+    let array = [];
+    array = await noteTable.find({ user: username }).toArray();
+
+    const auditTable = db.collection(auditCollectionName);
+    for (note of array) {
+      // console.log(note);
+      const audit = await auditTable.findOne({ note: note._id.toString() });
+      console.log(audit);
+      if (audit && "opinion" in audit) {
+        note["opinion"] = audit.opinion;
+      } else {
+        note["opinion"] = "No opinion";
+      }
+      console.log(note);
+    }
+    client.close();
+    return res.status(200).json({
+      message: "Get user notes successfully",
+      array,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      message: error.message,
     });
   }
 };
@@ -182,12 +217,12 @@ const updateNote = async (req, res) => {
   try {
     console.log(req.query);
     //pictures
-    await upload(req, res);
-    let picturesId = [];
-    req.files.forEach((picture) => {
-      //   console.log(picture.id.toString());
-      picturesId.push(picture.id.toString());
-    });
+    // await upload(req, res);
+    // let picturesId = [];
+    // req.files.forEach((picture) => {
+    //   //   console.log(picture.id.toString());
+    //   picturesId.push(picture.id.toString());
+    // });
     var updatedDate = new Date();
     await client.connect();
     const db = client.db(dbName);
@@ -294,6 +329,7 @@ module.exports = {
   changeNoteStatus,
   updateNote,
   getAllNotes,
+  getNoteByUsername,
   //   getListFiles,
   //   download,
 };
