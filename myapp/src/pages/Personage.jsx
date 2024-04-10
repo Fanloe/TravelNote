@@ -1,16 +1,34 @@
 // 个人中心--包括[我的游记]页面和[游记发布]入口
 import React from 'react';
+import { useContext,useState,useEffect } from "react";
 import 'wc-waterfall'
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Edit from '../img/edit.png'
+import { AuthContext } from "../context/authContext";
+
 
 const Personage = () => {
     // 个人信息
-    const userData = {
-        id: 1,
-        nickname: '张三',
-        avater: 'https://picsum.photos/50/50',
-    }
+    const { currentUser } = useContext(AuthContext);
+    const [userData, setUserData] = useState({
+        id: currentUser._id.slice(0,10),
+        nickname:currentUser.username,
+        avater: 'https://picsum.photos/50/50'
+    })
+    // 请求个人信息
+    useEffect(() => {
+        console.log(currentUser)
+        const getUserFigure = async () => {//得到用户头像
+            const res = await fetch(`/api/user/${currentUser._id}`)
+        }
+    })
+
+
+    // const userData = {
+    //     id: 1,
+    //     nickname: '张三',
+    //     avater: 'https://picsum.photos/50/50',
+    // }
     const postData = [
         {
             id:1,

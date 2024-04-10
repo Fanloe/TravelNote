@@ -8,13 +8,11 @@ export const AuthContexProvider = ({ children }) => {
     JSON.parse(localStorage.getItem("user")) || null
   );
 
-  const login = async (inputs) => {
-    const res = await axios.get(
-      `http://localhost:8080/verifyNormalUser?username=${inputs.username}&password=${inputs.password}`
-    );
+  const login = async (res,navigate) => {
+    console.log(res);
+    setCurrentUser(res.data);
+    navigate("/");
     // window.sessionStorage.setItem('accessToken', res.data.token)
-    console.log(res.data.data);
-    setCurrentUser(res.data.data);
     //currentUser = {username,password,_id,authority}
   };
 
