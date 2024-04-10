@@ -16,6 +16,34 @@ const userCollectionName = dbConfig.user;
 const noteCollectionName = dbConfig.note;
 const auditCollectionName = dbConfig.audit;
 
+const searchText = async (req, res) => {
+  try {
+    const searchQuery = req.query.query;
+
+    await client.connect();
+    const db = client.db(dbName);
+    const noteTable = db.collection(noteCollectionName);
+
+    await noteTable.createIndex({ title: "text", content: "text" });
+
+    const result = await noteTable
+      .find({ $text: { $search: searchQuery } })
+      .toArray();
+    client.close();
+
+    console.log(result);
+    return res.status(200).json({
+      message: "Notes found",
+      result,
+    });
+  } catch (error) {
+    return res.send({
+      message: "Error searching notes",
+      error: error.message,
+    });
+  }
+};
+
 const addNote = async (req, res) => {
   try {
     console.log(req.query);
@@ -330,6 +358,7 @@ module.exports = {
   updateNote,
   getAllNotes,
   getNoteByUsername,
+  searchText,
   //   getListFiles,
   //   download,
 };
