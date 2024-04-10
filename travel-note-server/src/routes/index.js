@@ -29,6 +29,10 @@ let routes = (app) => {
   router.get("/getNotesByStatus", noteController.getNotesByStatus);
   router.get("/changeNoteStatus", noteController.changeNoteStatus);
   router.patch("/updateNote", noteController.updateNote);
+
+  router.get("/addAudit", auditController.addAudit);
+  router.get("/getAuditByUser", auditController.getAuditByUser);
+
   return app.use("/", router);
 };
 

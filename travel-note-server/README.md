@@ -27,10 +27,10 @@ figures:
     <!-- - user._id -->
 note:
     - note._id
-    - user._id
+    - username
     - title
     - content
-    - date 
+    - date
     - [pictures]: picture._id
     - status:
         {0: "未审核", Pending
