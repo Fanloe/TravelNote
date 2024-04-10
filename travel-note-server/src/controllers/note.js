@@ -73,6 +73,26 @@ const addNote = async (req, res) => {
   }
 };
 
+const getAllNotes = async (req, res) => {
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const noteTable = db.collection(noteCollectionName);
+    let array = [];
+    array = await noteTable.find({}).toArray();
+
+    client.close();
+    return res.status(200).json({
+      message: "Get user notes successfully",
+      array,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      message: error.message,
+    });
+  }
+};
+
 const getNotesByStatus = async (req, res) => {
   try {
     // const username = req.query.username;
@@ -273,6 +293,7 @@ module.exports = {
   getNotesByStatus,
   changeNoteStatus,
   updateNote,
+  getAllNotes,
   //   getListFiles,
   //   download,
 };
