@@ -21,12 +21,13 @@ let routes = (app) => {
 
   router.get("/verifyAdministrator", userController.verifyAdministrator);
 
-  router.get("/getAllNotes", noteController.getAllNotes);
   router.post("/addNote", noteController.addNote);
   router.get("/getUserAllNotes", userController.getUserAllNotes);
   router.get("/getPicture", userController.getPictureById);
   router.post("/mypicture", noteController.uploadFiles);
 
+  router.get("/getAllNotes", noteController.getAllNotes);
+  router.get("/getNoteByUsername", noteController.getNoteByUsername);
   router.get("/getNotesByStatus", noteController.getNotesByStatus);
   router.get("/changeNoteStatus", noteController.changeNoteStatus);
   router.patch("/updateNote", noteController.updateNote);
