@@ -32,6 +32,7 @@ let routes = (app) => {
   router.patch("/updateNote", noteController.updateNote);
 
   router.get("/addAudit", auditController.addAudit);
+  router.get("/getAllAudit", auditController.getAllAudit);
   router.get("/getAuditByUser", auditController.getAuditByUser);
 
   return app.use("/", router);
