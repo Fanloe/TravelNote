@@ -21,10 +21,10 @@ const addNote = async (req, res) => {
     //pictures
     await upload(req, res);
     let picturesId = [];
-    // req.files.forEach((picture) => {
-    //   //   console.log(picture.id.toString());
-    //   picturesId.push(picture.id.toString());
-    // });
+    req.files.forEach((picture) => {
+      //   console.log(picture.id.toString());
+      picturesId.push(picture.id.toString());
+    });
     var updatedDate = new Date();
     await client.connect();
     const db = client.db(dbName);
@@ -164,10 +164,10 @@ const updateNote = async (req, res) => {
     //pictures
     await upload(req, res);
     let picturesId = [];
-    // req.files.forEach((picture) => {
-    //   //   console.log(picture.id.toString());
-    //   picturesId.push(picture.id.toString());
-    // });
+    req.files.forEach((picture) => {
+      //   console.log(picture.id.toString());
+      picturesId.push(picture.id.toString());
+    });
     var updatedDate = new Date();
     await client.connect();
     const db = client.db(dbName);
