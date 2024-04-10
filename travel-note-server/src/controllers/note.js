@@ -21,10 +21,10 @@ const addNote = async (req, res) => {
     //pictures
     await upload(req, res);
     let picturesId = [];
-    // req.files.forEach((picture) => {
-    //   //   console.log(picture.id.toString());
-    //   picturesId.push(picture.id.toString());
-    // });
+    req.files.forEach((picture) => {
+      //   console.log(picture.id.toString());
+      picturesId.push(picture.id.toString());
+    });
     var updatedDate = new Date();
     await client.connect();
     const db = client.db(dbName);
@@ -69,6 +69,26 @@ const addNote = async (req, res) => {
     return res.send({
       message: "Error adding note",
       error: error.message,
+    });
+  }
+};
+
+const getAllNotes = async (req, res) => {
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const noteTable = db.collection(noteCollectionName);
+    let array = [];
+    array = await noteTable.find({}).toArray();
+
+    client.close();
+    return res.status(200).json({
+      message: "Get user notes successfully",
+      array,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      message: error.message,
     });
   }
 };
@@ -164,10 +184,10 @@ const updateNote = async (req, res) => {
     //pictures
     await upload(req, res);
     let picturesId = [];
-    // req.files.forEach((picture) => {
-    //   //   console.log(picture.id.toString());
-    //   picturesId.push(picture.id.toString());
-    // });
+    req.files.forEach((picture) => {
+      //   console.log(picture.id.toString());
+      picturesId.push(picture.id.toString());
+    });
     var updatedDate = new Date();
     await client.connect();
     const db = client.db(dbName);
@@ -273,6 +293,7 @@ module.exports = {
   getNotesByStatus,
   changeNoteStatus,
   updateNote,
+  getAllNotes,
   //   getListFiles,
   //   download,
 };

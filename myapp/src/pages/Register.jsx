@@ -27,7 +27,7 @@ const Register = () => {
     try {
       await axios.get(`http://localhost:8080/register?username=${inputs.username}&password=${inputs.password}&authority=${inputs.authority}`);
     } catch (err) {
-      setError(err.response.data);
+      setError("注册失败");
     }
     navigate("/login");
   };

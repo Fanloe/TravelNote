@@ -1,6 +1,6 @@
 // 用户登录-支持头像上传或默认值
 // 实现简单的用户名/密码登录注册功能,对用户昵称做重复校验
-
+import axios from "axios";
 import React from 'react';
 import { useContext,useState } from "react";
 import { Link,useNavigate } from 'react-router-dom';
@@ -24,10 +24,12 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await login(inputs)
-            navigate("/");
+            const res = await axios.get('http://localhost:8080/verifyNormalUser?username='+inputs.username+'&password='+inputs.password);
+            console.log(res.data);
+            login(res.data,navigate);
         } catch (err) {
-            setError(err.response.data);
+            //err.response.data
+            setError("登录失败");
         }
     };
     return (
