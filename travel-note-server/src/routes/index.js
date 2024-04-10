@@ -5,6 +5,7 @@ const uploadController = require("../controllers/upload");
 const noteController = require("../controllers/note");
 const userController = require("../controllers/user");
 const auditController = require("../controllers/audit");
+const { note } = require("../config/db");
 
 let routes = (app) => {
   router.get("/", homeController.getHome);
@@ -30,6 +31,7 @@ let routes = (app) => {
   router.get("/getNoteByUsername", noteController.getNoteByUsername);
   router.get("/getNotesByStatus", noteController.getNotesByStatus);
   router.get("/changeNoteStatus", noteController.changeNoteStatus);
+  router.get("/searchText", noteController.searchText);
   router.patch("/updateNote", noteController.updateNote);
 
   router.get("/addAudit", auditController.addAudit);
