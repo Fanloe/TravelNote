@@ -77,13 +77,34 @@ const addAudit = async (req, res) => {
     });
   }
 };
+const getAllAudit = async (req, res) => {
+  try {
+    // const username = req.query.user;
+    await client.connect();
+    const db = client.db(dbName);
+    // const noteTable = db.collection(noteCollectionName);
+    const auditTable = db.collection(auditCollectionName);
 
+    const audits = await auditTable.find({}).toArray();
+    console.log(audits);
+    client.close();
+
+    return res.send({
+      message: "Audit fetched successfully",
+      audits: audits,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      message: error.message,
+    });
+  }
+};
 const getAuditByUser = async (req, res) => {
   try {
     const username = req.query.user;
     await client.connect();
     const db = client.db(dbName);
-    const noteTable = db.collection(noteCollectionName);
+    // const noteTable = db.collection(noteCollectionName);
     const auditTable = db.collection(auditCollectionName);
 
     const audits = await auditTable.find({ auditor: username }).toArray();
@@ -100,4 +121,4 @@ const getAuditByUser = async (req, res) => {
     });
   }
 };
-module.exports = { addAudit, getAuditByUser };
+module.exports = { addAudit, getAuditByUser, getAllAudit };
