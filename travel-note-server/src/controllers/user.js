@@ -315,6 +315,7 @@ const verifyAdministrator = async (req, res) => {
   console.log(user);
   client.close();
   if (
+    user &&
     user.password == password &&
     (user.authority == 1 || user.authority == 2)
   ) {
