@@ -5,6 +5,7 @@ const uploadController = require("../controllers/upload");
 const noteController = require("../controllers/note");
 const userController = require("../controllers/user");
 const auditController = require("../controllers/audit");
+const { note } = require("../config/db");
 
 let routes = (app) => {
   router.get("/", homeController.getHome);
@@ -21,14 +22,16 @@ let routes = (app) => {
 
   router.get("/verifyAdministrator", userController.verifyAdministrator);
 
-  router.get("/getAllNotes", noteController.getAllNotes);
   router.post("/addNote", noteController.addNote);
   router.get("/getUserAllNotes", userController.getUserAllNotes);
   router.get("/getPicture", userController.getPictureById);
   router.post("/mypicture", noteController.uploadFiles);
 
+  router.get("/getAllNotes", noteController.getAllNotes);
+  router.get("/getNoteByUsername", noteController.getNoteByUsername);
   router.get("/getNotesByStatus", noteController.getNotesByStatus);
   router.get("/changeNoteStatus", noteController.changeNoteStatus);
+  router.get("/searchText", noteController.searchText);
   router.patch("/updateNote", noteController.updateNote);
 
   router.get("/addAudit", auditController.addAudit);
