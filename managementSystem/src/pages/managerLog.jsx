@@ -13,7 +13,7 @@ const columns = [
     key: 'auditor',
   },
   {
-    title: '日期',
+    title: '时间',
     dataIndex: 'date',
     key: 'date',
   },
@@ -65,7 +65,7 @@ const ManagerLog = () =>{
             key: audit._id,
             auditor: audit.auditor,
             date: new Date(audit.date).toLocaleString(),
-            note: audit.note,
+            note: audit.title,
             actions: calculateAction(audit.beforeStatu, audit.afterStatus), 
             opinion: audit.opinion,
           }));
@@ -86,7 +86,7 @@ const ManagerLog = () =>{
             key: audit._id,
             auditor: audit.auditor,
             date: new Date(audit.date).toLocaleString(),
-            note: audit.note,
+            note: audit.title,
             actions: calculateAction(audit.beforeStatu, audit.afterStatus), 
             opinion: audit.opinion,
           }));

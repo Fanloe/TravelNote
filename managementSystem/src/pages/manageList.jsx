@@ -42,9 +42,9 @@ const Management = () => {
       try {
         const response = await axios.get(`http://localhost:8080/getAllNotes`);
         const notes = response.data.array; 
-  
+        const filteredNotes = notes.filter(note => note.status !== 3);
         // 并行获取所有图片的Blob数据
-        const fetchImagesBlobsPromises = notes.map(async (note) => {
+        const fetchImagesBlobsPromises = filteredNotes.map(async (note) => {
           const imageResponse = await axios.get(`http://localhost:8080/getPicture?picture=${note.pictures[0]}`, { responseType: 'blob' });
           // 创建一个Blob URL
           const imageUrl = URL.createObjectURL(imageResponse.data); 
@@ -54,7 +54,7 @@ const Management = () => {
         // 等待所有图片Blob URL的请求完成
         const imagesUrls = await Promise.all(fetchImagesBlobsPromises);
         // 将图片URL添加到作品数据中
-        const formattedData = notes.map((item, index) => ({
+        const formattedData = filteredNotes.map((item, index) => ({
           key: item._id,
           item: {
             image: imagesUrls[index], // 使用生成的Blob URL
@@ -79,15 +79,16 @@ const Management = () => {
       if ( value !== ''){
         const response = await axios.get(`http://localhost:8080/searchText?query=${value}`);
         const notes = response.data.result; 
+        const filteredNotes = notes.filter(note => note.status !== 3);
     
-        const fetchImagesBlobsPromises = notes.map(async (note) => {
+        const fetchImagesBlobsPromises = filteredNotes.map(async (note) => {
           const imageResponse = await axios.get(`http://localhost:8080/getPicture?picture=${note.pictures[0]}`, { responseType: 'blob' });
           const imageUrl = URL.createObjectURL(imageResponse.data); 
           return imageUrl;
         });
   
         const imagesUrls = await Promise.all(fetchImagesBlobsPromises);
-        const formattedData = notes.map((item, index) => ({
+        const formattedData = filteredNotes.map((item, index) => ({
           key: item._id,
           item: {
             image: imagesUrls[index], 

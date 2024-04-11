@@ -35,7 +35,7 @@ function App() {
   const navigate = useNavigate()
   const items = []
   routes.forEach((item) => {
-    if(item.path !== '/' && item.path !== '/register' && item.path !== '/travelnote'){
+    if(item.path !== '/' && item.path !== '/register' && item.path !== '/management/travelnote/:id'){
       //侧边栏不显示的页面
       items.push({
         label: item.label,
