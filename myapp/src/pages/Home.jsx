@@ -12,21 +12,23 @@ import axios from 'axios';
 
 const Home = () => {
     let location = useLocation();
-    let searchKey = location.state;
+    // const [searchKey, setSearchKey] = useState(location.state.keyword);
+    var searchKey = location.state?.keyword || '';
     console.log(searchKey)
     var listCount = 10;//每次划到底部增加10条
     const [page, setPage] = useState(0);//当前页码
     const [posts, setPosts] = useState([]);//所有post
     const [isAtBottom, setIsAtBottom] = useState(false);
     const [lazyposts, setlazyPosts] = useState(posts);//当前渲染在界面上的post
-    const [refrash, setRefrash] = useState(false);
     useEffect(()=>{
         const fetchData = async () => {
             try{
                 let res = null;
-                if(searchKey === '' || searchKey == null) res = await axios.get(`http://localhost:8080/getNotesByStatus?status=0`);//0表示未通过 1表示已通过
-                else res = await axios.get(`http://localhost:8080/getNotesByStatus?status=0&searchKey=${searchKey}`);
+                if(searchKey == '' || searchKey == null) res = await axios.get(`http://localhost:8080/getNotesByStatus?status=0`);//0表示未通过 1表示已通过
+                else res = await axios.get(`http://localhost:8080/searchText?query=${searchKey}`);
                 console.log(res.data);
+                // setSearchKey('')
+                if(res.data.array == null && res.data.result != null) res.data.array = res.data.result;
                 setPosts(res.data.array);
                 setlazyPosts(res.data.array.slice(0, listCount));
                 setPage(page+1);
@@ -35,7 +37,7 @@ const Home = () => {
             }
         }
         fetchData()
-    },[refrash])
+    },[searchKey])
     // const posts =[
     //     {
     //         id:1,
