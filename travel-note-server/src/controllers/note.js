@@ -24,11 +24,13 @@ const searchText = async (req, res) => {
     const db = client.db(dbName);
     const noteTable = db.collection(noteCollectionName);
 
-    await noteTable.createIndex({
-      user: "text",
-      title: "text",
-      content: "text",
-    });
+    const indexes = noteTable.indexInformation();
+    if ("user_text_title_text_content_text" in indexes)
+      await noteTable.createIndex({
+        user: "text",
+        title: "text",
+        content: "text",
+      });
 
     const result = await noteTable
       .find({ $text: { $search: searchQuery } })
