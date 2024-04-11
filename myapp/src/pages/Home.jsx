@@ -14,20 +14,21 @@ const Home = () => {
     const [posts, setPosts] = useState([]);//所有post
     const [isAtBottom, setIsAtBottom] = useState(false);
     const [lazyposts, setlazyPosts] = useState(posts);//当前渲染在界面上的post
+    const [refrash, setRefrash] = useState(false);
     useEffect(()=>{
         const fetchData = async () => {
             try{
                 const res = await axios.get(`http://localhost:8080/getNotesByStatus?status=0`);//0表示未通过 1表示已通过
                 console.log(res.data);
                 setPosts(res.data.array);
-                setlazyPosts(res.data.array.slice(page*listCount, listCount));
+                setlazyPosts(res.data.array.slice(0, listCount));
                 setPage(page+1);
             }catch(err){
                 console.log(err);
             }
         }
         fetchData()
-    },[])
+    },[refrash])
     // const posts =[
     //     {
     //         id:1,
@@ -127,14 +128,17 @@ const Home = () => {
     //     }
     // ]
     useEffect(() => {
-        if (isAtBottom && page*listCount+listCount<=posts.length) {
+        console.log(page)
+        if (isAtBottom && page*listCount<=posts.length) {
             // 加载更多数据
             // 模拟加载更多数据
             setTimeout(() => {
-                var newPosts = posts.slice(page*listCount,listCount);
+                var newPosts = posts.slice(page*listCount,(page+1)*listCount);
+                console.log(newPosts)
                 newPosts = [...lazyposts, ...newPosts];
                 setlazyPosts(newPosts);
                 setIsAtBottom(false);
+                setPage(page+1)
             }, 500)
         }
     },[isAtBottom])

@@ -2,6 +2,7 @@
 // 展示游记完整内容，包括作者昵称、头像
 // 图片可左右滑动查看，支持游记分享功能（比如分享到微信）
 import React from 'react';
+import {useState,useEffect} from 'react';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import DOMPurify from "dompurify";
 import { Image  } from 'antd';
@@ -16,7 +17,7 @@ import Goback from '../img/Goback.png'
 import Share from '../img/share.png'
 
 const Detail = () => {
-    const post = {
+    const post1 = {
         id:1,
         img:[
                 'https://images.pexels.com/photos/14260625/pexels-photo-14260625.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
@@ -32,6 +33,58 @@ const Detail = () => {
     const location = useLocation();
     let navigate = useNavigate();
     const postId = location.pathname.split('/')[2];
+    const [refrash,setRefrash] = useState(false);
+    let post = location.state;
+    const [pictureList,setPictureList] = useState([]);
+   
+    // useEffect(()=>{
+    //     const getPostPicture = async(id) => {
+    //         try{
+    //             await fetch('http://localhost:8080/getPicture?picture='+id)
+    //             .then(response => response.blob())
+    //             .then(blob => {
+    //                 setPictureList([...pictureList,URL.createObjectURL(blob)])
+    //             })
+    //         }catch(err){
+    //             console.log(err);
+    //         }
+    //     }
+    //     const getPostPictures = async() => {
+    //         if(post.pictures == null) return;
+    //         for(var i=0;i<post.pictures.length;i++){
+    //         console.log(post.pictures.length)
+    //             await getPostPicture(post.pictures[i]);
+    //         }
+    //     }
+    //     getPostPictures();
+    // },[refrash])
+
+    useEffect(() => {
+        const getPostPicture = async (id) => {
+            try {
+                const response = await fetch('http://localhost:8080/getPicture?picture=' + id);
+                const blob = await response.blob();
+                setPictureList(prevList => [...prevList, URL.createObjectURL(blob)]);
+            } catch (err) {
+                console.log(err);
+                // 可以在此处处理错误，例如显示错误消息
+            }
+        }
+    
+        const getPostPictures = async () => {
+            if (!post || !post.pictures) return;
+            try {
+                await Promise.all(post.pictures.map(getPostPicture));
+            } catch (err) {
+                console.log(err);
+            }
+        }
+    
+        getPostPictures();
+    }, [post, refrash]);
+    
+
+
     var settings = {
         dots: true,
         infinite: true,
@@ -44,14 +97,14 @@ const Detail = () => {
             {/* <div className='title'>TravelNote</div> */}
             <Title />
             <div className='author-info'>
-                <div className='post-top' key={post.id}>
+                <div className='post-top' key={post._id}>
                     <div className="goback"  onClick={()=>navigate(-1)}>
                         <img src={Goback} alt='goback'/>
                     </div>
                     <div className='authorImg'>
-                        <img src={post.img} alt={post.title} />
+                        <img src={post.authorImg.src} alt={post.title} />
                     </div>
-                    <div className='authorName'>{post.authorName}</div>
+                    <div className='authorName'>{post.user}</div>
                 </div>
                 <Link to='/' className="share">
                     <img src={Share} alt='share'/>
@@ -61,17 +114,17 @@ const Detail = () => {
                 <div className='detail-img'>
                     <Slider {...settings}>
                         {
-                            post.img.map((item,index)=>{
+                            pictureList.map((item,index)=>{
                                 return <div className='detail-img-item' key={index}>
+                                    {/* {pictureList.length} */}
                                     <div className='itemm'><Image src={item} /></div>
-                                    
                                 </div>
                             })
                         }
                     </Slider>
                 </div>
                 <div className='detail-title'>{post.title}</div>
-                <div className='detail-time'>{post.create_at}</div>
+                <div className='detail-time'>{post.date}</div>
                 <div className='detail-content'>
                     <p
                         dangerouslySetInnerHTML={{

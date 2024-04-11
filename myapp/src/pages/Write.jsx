@@ -22,6 +22,7 @@ const getBase64 = (file) =>
     reader.onerror = (error) => reject(error);
   });
 
+  
 const Write = () => {
     const {currentUser} = useContext(AuthContext);
     let navigate = useNavigate();
@@ -29,40 +30,82 @@ const Write = () => {
     let data = location.state;
     const [post,setPost] = useState(data || {});
     const editorRef = useRef(null);
-    const log = async () => {
-        if(editorRef.current){
-            console.log(editorRef.current.getContent());
-            setPost({...post,content:editorRef.current.getContent()})
-            console.log(post)
-            // 调用后端传某用户的post
-            try{
-                const res = await axios.post(`http://localhost:8080/addNote?username=${currentUser.username}&title=${post.title}&content=${post.content}`)
-                console.log(res);
-            }catch(err){
-                console.log(err);
-            }
-            // 成功后跳转至我的游记页面
-            // 失败后页面提示
-            navigate('/personage')
-        }
-    }
 
-
-    const images = [
-        'https://images.pexels.com/photos/14260625/pexels-photo-14260625.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        'https://images.pexels.com/photos/20637686/pexels-photo-20637686.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        'https://images.pexels.com/photos/20587031/pexels-photo-20587031.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    ]
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
-    const [fileList, setFileList] = useState(images.map((item,index)=>{
-        return {
-            name:index+'.png',
-            status:'done',
-            url:item,
+    const [fileList, setFileList] = useState([]);
+    const getPostPicture = async(id) => {
+        try{
+            let res = {
+                url: "",
+                originFileObj: ""
+            }
+            await fetch('http://localhost:8080/getPicture?picture='+id)
+            .then(response => response.blob())
+            .then(blob => {
+                res =  {
+                    url: URL.createObjectURL(blob),
+                    originFileObj: new Blob([blob], { type: 'image/png' })
+                };
+            })
+            return res;
+        }catch(err){
+            console.log(err);
         }
-    }));
+    }
+    const getPostPictures = async() => {
+        if(post.pictures == null) return;
+        for(var i=0;i<post.pictures.length;i++){
+            let res = await getPostPicture(post.pictures[i]);
+            setFileList(fileList => [...fileList, res]);
+            console.log(res);
+        }
+    }
+    useEffect(()=>{
+        getPostPictures();
+        console.log(post)
+    },[])
+
+    //发布游记
+    const log = async () => {
+        if(post.title == null || editorRef.current == null || fileList.length == 0){
+            alert('标题、内容、图片均为必须输入项');
+            return;
+        }
+        let formData = new FormData();
+        fileList.map(item => {
+            formData.append('pictures', item.originFileObj);
+        })
+        console.log(editorRef.current.getContent());
+        var newPost = {
+            ...post,
+            content:editorRef.current.getContent()
+        }
+        setPost(newPost)
+        console.log(formData)
+        console.log(fileList)
+        // 调用后端传某用户的post
+        if(data != null){
+            console.log(data.id)
+            navigate('/personage')
+            return;
+        }
+        try{
+            await fetch(`http://localhost:8080/addNote?username=${currentUser.username}&title=${post.title}&content=${newPost.content}`,
+            {
+                method:'POST',
+                body:formData
+            })
+        }catch(err){
+            console.log(err);
+        }
+        // 成功后跳转至我的游记页面
+        // 失败后页面提示
+        navigate('/personage')
+    }
+
+
     const handleCancel = () => setPreviewOpen(false);
     const handlePreview = async (file) => {
       if (!file.url && !file.preview) {
@@ -91,7 +134,6 @@ const Write = () => {
           </div>
         </button>
       );
-
 
     return (
         <div className='write-page'>
@@ -130,7 +172,7 @@ const Write = () => {
                 <Editor
                     apiKey='louvhda2pxdzvlt28yuc4ajrpwyctdnvym8mmglvps1m1bzn'
                     onInit={(evt, editor) => editorRef.current = editor}
-                    initialValue={post.content || '添加正文...'}
+                    initialValue={post.content}
                     init={{
                         height: 500,
                         menubar: false,
