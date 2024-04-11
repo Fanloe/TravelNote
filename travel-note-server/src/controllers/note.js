@@ -244,56 +244,67 @@ const changeNoteStatus = async (req, res) => {
 const updateNote = async (req, res) => {
   try {
     console.log(req.query);
-    //pictures
-    // await upload(req, res);
-    // let picturesId = [];
-    // req.files.forEach((picture) => {
-    //   //   console.log(picture.id.toString());
-    //   picturesId.push(picture.id.toString());
-    // });
+    // pictures;
+    await upload(req, res);
+    let picturesId = [];
+    req.files.forEach((picture) => {
+      //   console.log(picture.id.toString());
+      picturesId.push(picture.id.toString());
+    });
     var updatedDate = new Date();
     await client.connect();
     const db = client.db(dbName);
-    const userTable = db.collection(userCollectionName);
+    // const userTable = db.collection(userCollectionName);
     const noteTable = db.collection(noteCollectionName);
 
-    const user = await userTable.findOne({ username: req.query.username });
-    const userId = user._id.toString();
+    const noteId = req.query.note;
+    // const user = await userTable.findOne({ username: req.query.username });
+    // const userId = user._id.toString();
     const username = req.query.username;
     const title = req.query.title;
     const content = req.query.content;
 
-    const note = {
-      user: username,
-      title: title,
-      content: content,
-      date: updatedDate,
-      pictures: picturesId,
-      status: 0,
-    };
+    // const note = {
+    //   _id: new ObjectId(noteId),
+    //   user: username,
+    //   title: title,
+    //   content: content,
+    //   date: updatedDate,
+    //   pictures: picturesId,
+    //   status: 0,
+    // };
 
-    const result = await noteTable.insertOne(note);
-    console.log(result);
-    const noteId = result.insertedId.toString();
-    console.log(noteId);
-    if (!("notes" in user)) {
-      user["notes"] = [noteId];
-    } else {
-      user["notes"].push(noteId);
-    }
-    const updateUser = await userTable.updateOne(
-      { _id: userId },
-      { $set: { notes: user["notes"] } }
+    const originNote = await noteTable.updateOne(
+      { _id: ObjectId(noteId) },
+      {
+        $set: {
+          // user: username,
+          title: title,
+          content: content,
+          date: updatedDate,
+          pictures: picturesId,
+          status: 0,
+        },
+      }
     );
+    // const note = await noteTable.findOne({ _id: ObjectId(noteId) });
+    // console.log("note:\n" + note);
+
+    // console.log("originNote: \n" + originNote);
+    // const noteId = result.insertedId.toString();
+    // const updateUser = await userTable.updateOne(
+    //   { _id: userId },
+    //   { $set: { notes: user["notes"] } }
+    // );
     // console.log(note);
     client.close();
 
     return res.send({
-      message: "Note added successfully",
+      message: "Note updated successfully",
     });
   } catch (error) {
     return res.send({
-      message: "Error adding note",
+      message: "Error updating note",
       error: error.message,
     });
   }
