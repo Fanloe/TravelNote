@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Layout, 
   Button, 
@@ -12,11 +12,21 @@ import {
   Modal } from 'antd';
 import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
 import image1 from '../images/test1.jpg'
-import { useNavigate, Link } from 'react-router-dom';
+import image2 from '../images/test1.jpg'
+import image3 from '../images/test1.jpg'
+import { useNavigate, Link, useParams } from 'react-router-dom';
+import axios from 'axios';
 
 const { TextArea } = Input;
 const { Meta} = Card;
 const { Content } = Layout;
+
+const images = [
+  'image1.jpg', // 你的图片URL
+  'image2.jpg',
+  'image3.jpg',
+  // 添加更多图片URL
+];
 
 const items = [
   {
@@ -43,11 +53,14 @@ const items = [
 ];
 
 const Travelnote = () => {
+  const { id } = useParams(); // 获取路由参数中的作品ID
+
   const navigate = useNavigate()
   const [textAreaValue, setTextAreaValue] = useState('');
   const [isTextareaRequired, setIsTextareaRequired] = useState(false);
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
+
   const modalText = '请问您确定要删除该作品吗？';
   const userRole = 'admin';
 
@@ -105,7 +118,24 @@ const Travelnote = () => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
+  const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8080/getNoteDetails/${id}`);
+        setDetails(response.data); // 假设后端直接返回了作品的详细信息
+      } catch (error) {
+        console.error('Failed to fetch details:', error);
+      }
+    };
+
+    fetchDetails();
+  }, [id]);
+
+
+
   
   return (
     
