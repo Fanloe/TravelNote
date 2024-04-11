@@ -36,6 +36,7 @@ const Detail = () => {
     const [refrash,setRefrash] = useState(false);
     let post = location.state;
     const [pictureList,setPictureList] = useState([]);
+    const [images,setImages] = useState([])
    
     // useEffect(()=>{
     //     const getPostPicture = async(id) => {
@@ -81,6 +82,7 @@ const Detail = () => {
         }
     
         getPostPictures();
+        setImages(pictureList)
     }, [post, refrash]);
     
 
@@ -102,7 +104,7 @@ const Detail = () => {
                         <img src={Goback} alt='goback'/>
                     </div>
                     <div className='authorImg'>
-                        <img src={post.authorImg.src} alt={post.title} />
+                        <img src={post.authorImg.src} alt="头像" />
                     </div>
                     <div className='authorName'>{post.user}</div>
                 </div>
@@ -114,7 +116,7 @@ const Detail = () => {
                 <div className='detail-img'>
                     <Slider {...settings}>
                         {
-                            pictureList.map((item,index)=>{
+                            images.map((item,index)=>{
                                 return <div className='detail-img-item' key={index}>
                                     {/* {pictureList.length} */}
                                     <div className='itemm'><Image src={item} /></div>

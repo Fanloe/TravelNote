@@ -4,11 +4,16 @@
 // 点击游记卡片可跳转至当前游记详情页
 
 import React, { useRef, useState, useEffect } from 'react';
+import { useNavigate,useLocation } from 'react-router-dom';
+
 import 'wc-waterfall'
 import Card from '../components/Card';
 import axios from 'axios';
 
 const Home = () => {
+    let location = useLocation();
+    let searchKey = location.state;
+    console.log(searchKey)
     var listCount = 10;//每次划到底部增加10条
     const [page, setPage] = useState(0);//当前页码
     const [posts, setPosts] = useState([]);//所有post
@@ -18,7 +23,9 @@ const Home = () => {
     useEffect(()=>{
         const fetchData = async () => {
             try{
-                const res = await axios.get(`http://localhost:8080/getNotesByStatus?status=0`);//0表示未通过 1表示已通过
+                let res = null;
+                if(searchKey === '' || searchKey == null) res = await axios.get(`http://localhost:8080/getNotesByStatus?status=0`);//0表示未通过 1表示已通过
+                else res = await axios.get(`http://localhost:8080/getNotesByStatus?status=0&searchKey=${searchKey}`);
                 console.log(res.data);
                 setPosts(res.data.array);
                 setlazyPosts(res.data.array.slice(0, listCount));
