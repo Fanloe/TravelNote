@@ -172,7 +172,7 @@ const Personage = () => {
                                 <img src={post.img} alt='游记图片'/>
                                 <div className='person-card-container'>
                                     <div className='person-card-title'>{post.title}</div>
-                                    <div className='person-card-content'>{getText(post.content).slice(0,20)}...</div>
+                                    <div className='person-card-content'>{getText(post.content).substring(0,20)}...</div>
                                 </div>
                             </div>
                             <div className='person-card-state'>

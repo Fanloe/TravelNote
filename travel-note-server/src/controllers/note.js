@@ -83,22 +83,16 @@ const addNote = async (req, res) => {
     console.log(result);
     const noteId = result.insertedId.toString();
     console.log(noteId);
-
-    var noteIds = [];
-
     if (!("notes" in user)) {
-      noteIds = [noteId];
+      user["notes"] = [noteId];
     } else {
-      noteIds = user["notes"];
-      console.log(noteIds);
-      noteIds.push(noteId);
+      user["notes"].push(noteId);
     }
-    console.log(noteIds);
     const updateUser = await userTable.updateOne(
-      { _id: user._id },
-      { $set: { notes: noteIds } }
+      { _id: userId },
+      { $set: { notes: user["notes"] } }
     );
-
+    // console.log(note);
     client.close();
 
     return res.send({
@@ -108,36 +102,6 @@ const addNote = async (req, res) => {
     return res.send({
       message: "Error adding note",
       error: error.message,
-    });
-  }
-};
-
-const getNoteById = async (req, res) => {
-  try {
-    const noteId = req.query.note;
-
-    await client.connect();
-    const db = client.db(dbName);
-    const noteTable = db.collection(noteCollectionName);
-    const auditTable = db.collection(auditCollectionName);
-
-    note = await noteTable.findOne({ _id: ObjectId(noteId) });
-    const audit = await auditTable.findOne({ note: noteId });
-    console.log(audit);
-    if (audit && "opinion" in audit) {
-      note["opinion"] = audit.opinion;
-    } else {
-      note["opinion"] = "No opinion";
-    }
-    console.log(note);
-    client.close();
-    return res.status(200).json({
-      message: "Get user notes successfully",
-      note,
-    });
-  } catch (error) {
-    return res.status(500).send({
-      message: error.message,
     });
   }
 };
@@ -293,7 +257,7 @@ const deleteNote = async (req, res) => {
     const noteTable = db.collection(noteCollectionName);
 
     const user = await userTable.findOne({ username: username });
-    const note = await noteTable.deleteOne({ _id: ObjectId(noteId) });
+    // const note = await noteTable.deleteOne({ _id: ObjectId(noteId) });
 
     const noteIds = user["notes"];
     // console.log(noteIds);
@@ -444,7 +408,6 @@ module.exports = {
   getNoteByUsername,
   searchText,
   deleteNote,
-  getNoteById,
   //   getListFiles,
   //   download,
 };

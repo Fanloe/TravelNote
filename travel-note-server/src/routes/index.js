@@ -30,12 +30,11 @@ let routes = (app) => {
   router.get("/getAllNotes", noteController.getAllNotes);
   router.get("/getNoteByUsername", noteController.getNoteByUsername);
   router.get("/getNotesByStatus", noteController.getNotesByStatus);
+  router.get("/changeNoteStatus", noteController.changeNoteStatus);
   router.get("/searchText", noteController.searchText);
   router.patch("/updateNote", noteController.updateNote);
-  router.delete("/deleteNote", noteController.deleteNote);
-  router.get("/getNoteById", noteController.getNoteById);
+  router.get("/deleteNote", noteController.deleteNote);
 
-  router.get("/changeNoteStatus", noteController.changeNoteStatus);
   router.get("/addAudit", auditController.addAudit);
   router.get("/getAllAudit", auditController.getAllAudit);
   router.get("/getAuditByUser", auditController.getAuditByUser);
