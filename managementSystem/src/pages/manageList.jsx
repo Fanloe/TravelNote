@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Layout,
   Table, 
   Input,  
   Breadcrumb, 
  } from 'antd';
-import { UserOutlined, DashboardOutlined,SearchOutlined } from '@ant-design/icons';
-import image1 from '../images/test1.jpg'
-import image2 from '../images/test2.jpg'
-import image3 from '../images/test3.jpg'
+import { SearchOutlined } from '@ant-design/icons';
+import axios from 'axios';
 import wait from '../images/pending.png'
 import pass from '../images/pass.png'
 import fail from '../images/fail.png'
@@ -19,121 +17,18 @@ const { Content } = Layout;
 const { Column } = Table;
 const { Search } = Input;
 
-const data = [
-  {
-    key: '1',
-    item: {
-      image:image1,
-      title:'标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题',
-      content:'文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本',
-    },
-    status: '待审核',
-  },
-  {
-    key: '2',
-    item: {
-      image:image2,
-      title:'标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题',
-      content:'文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本',
-    },
-    status: '已通过',
-  },
-  {
-    key: '3',
-    item: {
-      image:image3,
-      title:'标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题',
-      content:'文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本',
-    },
-    status: '未通过',
-  },
-  {
-    key: '4',
-    item: {
-      image:image3,
-      title:'标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题',
-      content:'文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本',
-    },
-    status: '未通过',
-  },
-  {
-    key: '5',
-    item: {
-      image:image3,
-      title:'标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题',
-      content:'文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本',
-    },
-    status: '未通过',
-  },
-  {
-    key: '6',
-    item: {
-      image:image3,
-      title:'标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题',
-      content:'文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本',
-    },
-    status: '未通过',
-  },
-  {
-    key: '7',
-    item: {
-      image:image3,
-      title:'标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题',
-      content:'文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本',
-    },
-    status: '未通过',
-  },
-  {
-    key: '8',
-    item: {
-      image:image3,
-      title:'标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题',
-      content:'文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本',
-    },
-    status: '未通过',
-  },
-  {
-    key: '9',
-    item: {
-      image:image3,
-      title:'标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题',
-      content:'文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本',
-    },
-    status: '未通过',
-  },
-  {
-    key: '10',
-    item: {
-      image:image3,
-      title:'标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题',
-      content:'文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本',
-    },
-    status: '未通过',
-  },
-  {
-    key: '11',
-    item: {
-      image:image3,
-      title:'标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题标题',
-      content:'文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本',
-    },
-    status: '未通过',
-  },
-
-];
-
+const statusMap = {
+  0: { text: "待审核", image: wait },
+  1: { text: "已通过", image: pass },
+  2: { text: "未通过", image: fail },
+};
 
 
 const Management = () => {
   const navigate = useNavigate()
-  const [searchText, setSearchText] = useState('');
-
-  const filteredData = data.filter((item) =>
-    item.item.title.toLowerCase().includes(searchText.toLowerCase())
-  );
-
-  
+  const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  
   const renderSerialNumber = (text, record, index) => {
     return (currentPage - 1) * 5 + index + 1;
   };
@@ -142,18 +37,97 @@ const Management = () => {
     setCurrentPage(page);
   };
 
-  /*
-  const [data, setData] = useState([]);
-
   useEffect(() => {
-    axios.get('')
-      .then(response => {
-        setData(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);*/
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8080/getAllNotes`);
+        const notes = response.data.array; 
+  
+        // 并行获取所有图片的Blob数据
+        const fetchImagesBlobsPromises = notes.map(async (note) => {
+          const imageResponse = await axios.get(`http://localhost:8080/getPicture?picture=${note.pictures[0]}`, { responseType: 'blob' });
+          // 创建一个Blob URL
+          const imageUrl = URL.createObjectURL(imageResponse.data); 
+          return imageUrl;
+        });
+  
+        // 等待所有图片Blob URL的请求完成
+        const imagesUrls = await Promise.all(fetchImagesBlobsPromises);
+        // 将图片URL添加到作品数据中
+        const formattedData = notes.map((item, index) => ({
+          key: item._id,
+          item: {
+            image: imagesUrls[index], // 使用生成的Blob URL
+            user: item.user,
+            title: item.title,
+            content: item.content,
+          },
+          status: item.status,
+        }));
+  
+        setData(formattedData);
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    };
+    
+    fetchData();
+  }, []);
+
+  const onSearch = async (value) => {
+    try {
+      if ( value !== ''){
+        const response = await axios.get(`http://localhost:8080/searchText?query=${value}`);
+        const notes = response.data.result; 
+    
+        const fetchImagesBlobsPromises = notes.map(async (note) => {
+          const imageResponse = await axios.get(`http://localhost:8080/getPicture?picture=${note.pictures[0]}`, { responseType: 'blob' });
+          const imageUrl = URL.createObjectURL(imageResponse.data); 
+          return imageUrl;
+        });
+  
+        const imagesUrls = await Promise.all(fetchImagesBlobsPromises);
+        const formattedData = notes.map((item, index) => ({
+          key: item._id,
+          item: {
+            image: imagesUrls[index], 
+            user: item.user,
+            title: item.title,
+            content: item.content,
+          },
+          status: item.status,
+        }));
+  
+        setData(formattedData);
+      }else{
+        const response = await axios.get(`http://localhost:8080/getAllNotes`);
+        const notes = response.data.array; 
+  
+        const fetchImagesBlobsPromises = notes.map(async (note) => {
+          const imageResponse = await axios.get(`http://localhost:8080/getPicture?picture=${note.pictures[0]}`, { responseType: 'blob' });
+          const imageUrl = URL.createObjectURL(imageResponse.data); 
+          return imageUrl;
+        });
+  
+        const imagesUrls = await Promise.all(fetchImagesBlobsPromises);
+        const formattedData = notes.map((item, index) => ({
+          key: item._id,
+          item: {
+            image: imagesUrls[index], // 使用生成的Blob URL
+            user: item.user,
+            title: item.title,
+            content: item.content,
+          },
+          status: item.status,
+        }));
+  
+        setData(formattedData);
+      }
+      
+    } catch (error) {
+      console.error('搜索失败', error);
+    }
+  };
 
 
   return (
@@ -183,7 +157,7 @@ const Management = () => {
         <div>
           <Search
             placeholder="输入作品名称搜索"
-            onSearch={(value) => setSearchText(value)}
+            onSearch={onSearch}
             enterButton={
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <SearchOutlined />
@@ -201,12 +175,18 @@ const Management = () => {
           />
         </div>
         <Table
-          dataSource={filteredData}
+          dataSource={data}
           pagination={{ pageSize: 5, showSizeChanger: true, onChange: handlePaginationChange  }}
           bordered
           size="large"
           style={{ boxShadow:'0 2px 10px rgba(0, 0, 0, 0.1)', marginLeft: 30, marginRight: 30, borderRadius: 10}}
-              
+          onRow={(record) => {
+            return {
+              onClick:() => {
+                navigate(`travelnote/${record.key}`);
+              }
+            }
+          }}
         >
            <Column
             title="序号"
@@ -221,17 +201,18 @@ const Management = () => {
             key="item"
             width='80%'
             align="center"
-            render= {(item) => (
+            render= {(item, record) => (
               <div style={{ display: 'flex', alignItems: 'center'}} onClick={() => navigate('/travelnote')}>
                 <div style={{ marginRight: '20px' }}>
                   <img 
-                    src={item.image} 
+                    src={record.item.image} 
                     alt="图片"
                     style={{ maxWidth: '100px', maxHeight: '100px', borderRadius: '10px'}}
                   />
                 </div>
-                <div>
+                <div style={{ textAlign:'left'}}>
                   <div style={{ fontSize: '18px', fontWeight: 'bold', maxWidth: '600px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: '1', WebkitBoxOrient: 'vertical'}}>{item.title}</div>
+                  <div style={{ fontSize: '12px',maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: '2', WebkitBoxOrient: 'vertical' }}>作者：{item.user}</div>
                   <div style={{ maxWidth: '900px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: '2', WebkitBoxOrient: 'vertical' }}>{item.content}</div>
                 </div>
               </div>
@@ -244,36 +225,30 @@ const Management = () => {
             align='center'
             filters={[
               {
-                text:'已通过',
-                value:'已通过'
+                text:'待审核',
+                value:0
               },
               {
-                text:'待审核',
-                value:'待审核'
+                text:'已通过',
+                value:1
               },
               {
                 text:'未通过',
-                value:'未通过'
+                value:2
               },
             ]}
             onFilter={(value, record) => record.status === value}
-            render={(status) => (
+            render={status => (
               <span>
-                {status === '待审核' && <img 
-                    src={wait}
-                    alt="待审核"
-                    style={{ maxWidth: '100px', maxHeight: '100px', borderRadius: '10px'}}
-                  />}
-                {status === '已通过' && <img 
-                    src={pass}
-                    alt="已通过"
-                    style={{ maxWidth: '100px', maxHeight: '100px', borderRadius: '10px'}}
-                  />}
-                {status === '未通过' && <img 
-                    src={fail}
-                    alt="未通过"
-                    style={{ maxWidth: '100px', maxHeight: '100px', borderRadius: '10px'}}
-                  />}
+                {statusMap[status] && statusMap[status].image ? (
+                  <img
+                    src={statusMap[status].image}
+                    alt={statusMap[status].text}
+                    style={{ maxWidth: '100px', maxHeight: '100px', borderRadius: '10px' }}
+                  />
+                ) : (
+                  statusMap[status].text
+                )}
               </span>
             )}
           />

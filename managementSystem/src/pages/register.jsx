@@ -1,30 +1,38 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Row, Col } from 'antd';
+import { Form, Input, Button, Select, message } from 'antd';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import '../css/style.css'
 import axios from 'axios';
 
+const { Option } = Select;
 
 const Register = () => {
   const [inputs, setInputs] = useState({
     username: "",
     password: "",
+    authority:"",
   });
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const handleChange = (e) => {
-    setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target ? e.target : e;
+    setInputs((prev) => ({ ...prev, [name]: value }));
   };
+
 
   const onFinish = async (values) => {
     try {
-      const response = await axios.post('', {
-        username: inputs.username,
-      })
-      navigate('/');
+      const response = await axios.get(`http://localhost:8080/register?username=${values.username}&password=${values.password}&authority=${values.authority}`);
+      if(response.data && response.data.message === "Sign-up success"){
+        message.success(`您已成功注册！`);
+        navigate('/');
+      }else{
+        message.error(`注册失败，请稍后再试。`);
+        setError(response.data.message || '未知错误，请稍后再试。');
+      }
     } catch (error) {
-      setError(error.response.data);
+      setError(error.response?.data.message || '注册请求失败，请稍后再试。');
     }
     
   };
@@ -68,6 +76,18 @@ const Register = () => {
               placeholder="密码"
               onChange={handleChange}
             />
+          </Form.Item>
+          <Form.Item
+            name="authority"
+            rules={[{ required: true, message: '请选择账号权限!' }]}
+          >
+            <Select
+              placeholder="选择账号权限"
+              allowClear
+            >
+              <Option value="1">审核员</Option>
+              <Option value="2">管理员</Option>
+            </Select>
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" className="register-form-button">
