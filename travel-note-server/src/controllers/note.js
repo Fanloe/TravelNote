@@ -241,6 +241,60 @@ const changeNoteStatus = async (req, res) => {
   }
 };
 
+const deleteNote = async (req, res) => {
+  try {
+    console.log(req.query);
+    const username = req.query.username;
+    const noteId = req.query.note;
+
+    await client.connect();
+    const db = client.db(dbName);
+    const userTable = db.collection(userCollectionName);
+    const noteTable = db.collection(noteCollectionName);
+
+    const user = await userTable.findOne({ username: username });
+    // const note = await noteTable.deleteOne({ _id: ObjectId(noteId) });
+
+    const noteIds = user["notes"];
+    // console.log(noteIds);
+
+    var newNoteIds = [];
+    for (id of noteIds) {
+      if (id !== noteId) {
+        console.log(id);
+        console.log(noteId);
+        newNoteIds.push(id);
+      }
+    }
+    // console.log(noteIds.toString());
+    console.log(newNoteIds.toString());
+    await userTable.updateOne(
+      {
+        username: username,
+      },
+      {
+        $set: {
+          notes: newNoteIds,
+        },
+      }
+    );
+
+    const newUser = await userTable.findOne({ username: username });
+    console.log(newUser.toString());
+
+    client.close();
+
+    return res.send({
+      message: "Note deleted successfully",
+    });
+  } catch (error) {
+    return res.send({
+      message: "Error deleting note",
+      error: error.message,
+    });
+  }
+};
+
 const updateNote = async (req, res) => {
   try {
     console.log(req.query);
@@ -263,17 +317,6 @@ const updateNote = async (req, res) => {
     const username = req.query.username;
     const title = req.query.title;
     const content = req.query.content;
-
-    // const note = {
-    //   _id: new ObjectId(noteId),
-    //   user: username,
-    //   title: title,
-    //   content: content,
-    //   date: updatedDate,
-    //   pictures: picturesId,
-    //   status: 0,
-    // };
-
     const originNote = await noteTable.updateOne(
       { _id: ObjectId(noteId) },
       {
@@ -287,16 +330,6 @@ const updateNote = async (req, res) => {
         },
       }
     );
-    // const note = await noteTable.findOne({ _id: ObjectId(noteId) });
-    // console.log("note:\n" + note);
-
-    // console.log("originNote: \n" + originNote);
-    // const noteId = result.insertedId.toString();
-    // const updateUser = await userTable.updateOne(
-    //   { _id: userId },
-    //   { $set: { notes: user["notes"] } }
-    // );
-    // console.log(note);
     client.close();
 
     return res.send({
@@ -370,6 +403,7 @@ module.exports = {
   getAllNotes,
   getNoteByUsername,
   searchText,
+  deleteNote,
   //   getListFiles,
   //   download,
 };
