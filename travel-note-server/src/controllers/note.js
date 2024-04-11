@@ -121,7 +121,7 @@ const getNoteById = async (req, res) => {
     const noteTable = db.collection(noteCollectionName);
     const auditTable = db.collection(auditCollectionName);
 
-    note = await noteTable.findOne({ _id: ObjectId(noteId) });
+    note = await noteTable.findOne({ _id: new ObjectId(noteId) });
     const audit = await auditTable.findOne({ note: noteId });
     console.log(audit);
     if (audit && "opinion" in audit) {
