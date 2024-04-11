@@ -80,7 +80,7 @@ const Personage = () => {
 
         getUserFigure();
         getUserPosts();
-    },[refrash,userData])
+    },[userData])
 
 
     // const userData = {
@@ -148,6 +148,18 @@ const Personage = () => {
             console.log(err)
         }
     }
+
+    const deletePost = async (id) => {
+        try{
+            console.log(id);
+            await axios.delete('http://localhost:8080/deleteNote?username='+userData.username+'&note='+id)
+            setRefrash(!refrash);
+            
+        }catch(err){
+            console.log(err)
+        }
+    }
+
     return (
         <div className='personage-page'>
             <div className='person-info'>
@@ -178,7 +190,7 @@ const Personage = () => {
                             <div className='person-card-state'>
                                 <span style={{color:post.checkState==='已通过'?'green':post.checkState==='未通过'?'#da4b3b':'#000'}}>{post.checkState}</span>
                                 <div className='person-card-change'>
-                                    <button className='delete'>删除</button>
+                                    <button className='delete' onClick={() => deletePost(post.id)}>删除</button>
                                     {
                                         post.checkState==='已通过'?null:
                                         <button className='edit' onClick={()=>{navigate('/write',{state:post})}}>编辑</button>

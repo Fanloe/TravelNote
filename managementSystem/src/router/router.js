@@ -1,4 +1,4 @@
-import React, { lazy, Suspense} from 'react';
+import React from 'react';
 import {
     HomeOutlined,
     UserOutlined,
@@ -41,7 +41,7 @@ const routes = [
       icon:<FormOutlined />
     },
     {
-      path:'/travelnote',
+      path:'/management/travelnote/:id',
       element:<Travelnote />,
     },
     
