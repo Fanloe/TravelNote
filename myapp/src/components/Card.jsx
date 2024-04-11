@@ -9,9 +9,17 @@ const Card = (props) => {
     //{content,pictures[],status,title,user,_id}
     const navigate = useNavigate();
     const ToDetail  = (()=>{
-        navigate("/detail/"+post.id);
+        // 跳转到详情页，并传递post数据
+        let detailData = {
+            ...post,
+            authorImg:authorImg,
+            img:img
+        }
+        console.log(detailData)
+        navigate("/detail/"+post._id,{state:detailData});
     })
     useEffect(()=>{
+        console.log(post)
         const fetchPicture = async () => {
             await fetch('http://localhost:8080/getPicture?picture='+post.pictures[0])
             .then(response => response.blob())
@@ -19,16 +27,20 @@ const Card = (props) => {
                 setImg({ src: URL.createObjectURL(blob) })
             })
             // setPost({...post,img:res.picture});
+            
+        }
+        const fetchAuthorImg = async () => {
             // 请求用户头像，需要首页请求post时返回用户头像id
-            await fetch('http://localhost:8080/getPicture?picture='+'6612bb9cf20f806e8914f5d4')
+            await fetch('http://localhost:8080/getUserFigure?username='+post.user)
             .then(response => response.blob())
             .then(blob => {
                 setAuthorImg({ src: URL.createObjectURL(blob) })
             })
         }
+        fetchAuthorImg();
         fetchPicture();
         console.log(img);
-    },[])
+    },[post])
     return (
         <div className='card' onClick={ToDetail}>
             <div className='post-top' key={post._id}>
@@ -44,7 +56,7 @@ const Card = (props) => {
                     <img src={authorImg.src} alt={post.authorName} />
                 </div>
                 <div className='post-author-name'>{post.authorName}</div>
-                <div className='post-create-at'>{post.create_at}</div>
+                <div className='post-create-at'>{post.date.slice(0,16)}</div>
             </div>
         </div>
     )
