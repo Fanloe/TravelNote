@@ -1,45 +1,15 @@
-
-import { Breadcrumb, Layout, Button, theme, Descriptions, Avatar, Space, Upload, Tooltip } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Breadcrumb, Layout, Button, theme, Descriptions, Avatar, Upload, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
 import { UserOutlined } from '@ant-design/icons';
-import image1 from '../images/test1.jpg';
+import { useUser } from '../context/userContext.js';
+import axios from 'axios';
 
 const { Content } = Layout;
 
 
-
-const items = [
-    {
-      key: '1',
-      label: '用户名称',
-      children: '小巨人',
-    },
-    {
-      key: '2',
-      label: '用户角色',
-      children: '管理员',
-    },
-    {
-      key: '3',
-      label: 'Remark',
-      children: 'empty',
-    },
-    {
-      key: '4',
-      label: '用户权限描述',
-      span: 2,
-      children: '可以执行系统所有支持的操作（通过、拒绝、删除）' ,
-    },
-    {
-      key: '5',
-      label: 'Remark',
-      children: 'empty',
-    },
-  ];
-
-
-const managerData = () =>{
-
+const ManagerData = () =>{
+    
     const {
         token: { colorBgContainer, borderRadiusLG },
       } = theme.useToken();
@@ -51,6 +21,77 @@ const managerData = () =>{
     const handleSignout = () => {
         console.log('注销账号');
     }
+
+    const { user } = useUser();
+
+    const items = [
+        {
+          key: '1',
+          label: '用户名称',
+          children:user.username,
+        },
+        {
+          key: '2',
+          label: '用户角色',
+          children: (user.authority===1) ? '审核员':'管理员' ,
+        },
+        {
+          key: '3',
+          label: 'Remark',
+          children: 'empty',
+        },
+        {
+          key: '4',
+          label: '用户权限描述',
+          span: 2,
+          children:  (user.authority===1) ? '可以执行审核支持的操作（通过、拒绝）' : '可以执行系统所有支持的操作（通过、拒绝、删除）' ,
+        },
+        {
+          key: '5',
+          label: 'Remark',
+          children: 'empty',
+        },
+      ];
+
+      const [image, setImage] = useState({src:null}); 
+      const [refrash,setRefrash] = useState(false);
+
+    
+      const handleUpload = async (file) => {
+        const formData = new FormData();
+        formData.append('figures', file); 
+    
+        try {
+          const response = await axios.post(`http://localhost:8080/uploadUserFigure?username=${user.username}`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data', 
+            },
+          });
+          setRefrash(!refrash);
+          console.log(refrash);
+        } catch (error) {
+          console.error('上传头像失败:', error);
+        }
+    
+        return false;
+      };
+
+      useEffect(() => {
+        const getUserFigure = async () => {
+          try {
+            const response = await fetch(`http://localhost:8080/getUserFigure?username=${user.username}`);
+            const blob = await response.blob();
+            setImage({ src: URL.createObjectURL(blob) });
+          } catch (err) {
+            console.log(err);
+          }
+        };
+      
+        getUserFigure();
+      }, [refrash,user]);
+      
+
+      
       
     return (
         <Layout>
@@ -94,10 +135,10 @@ const managerData = () =>{
                             <Tooltip title="点击上传头像">
                                 <Upload
                                     showUploadList={false}
-                                    beforeUpload={() => false}
+                                    beforeUpload={handleUpload}
                                     >
-                                    {image1 ? (
-                                        <Avatar size={200} src={image1} />
+                                    {image ? (
+                                        <Avatar size={200} src={image.src} />
                                     ) : (
                                         <Avatar size={200} icon={<UserOutlined />} />
                                     )}
@@ -119,4 +160,4 @@ const managerData = () =>{
     )
 }
 
-export default managerData;
+export default ManagerData;

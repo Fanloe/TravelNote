@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Row, Col } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import '../css/style.css'
 import axios from 'axios';
+import { useUser } from '../context/userContext.js';
+
 
 
 const Login = () => {
+
+  const { setUser } = useUser();
   const [inputs, setInputs] = useState({
     username: "",
     password: "",
@@ -14,19 +18,24 @@ const Login = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const handleChange = (e) => {
-    setInputs((prev) => ({ ...prev, [e.username]: e.password }));
+    setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const onFinish = async () => {
+  const onFinish = async (values) => {
     try {
-      const response = await axios.get(`http://localhost:8080/verifyAdministrator?username=${inputs.username}&password=${inputs.password}`, inputs);
-      if(response.data.success){
+      const response = await axios.get(`http://localhost:8080/verifyAdministrator?username=${values.username}&password=${values.password}`
+      , values);
+      if(response.data.message === 'success'){
+        
+        message.success('登录成功!');
+        setUser(response.data.data);
         navigate('/home');
       }else{
+        message.error('用户名或密码错误，请重试!')
         setError(response.data.message);
       }
     } catch (error) {
-      setError(error.response ? error.response.data : "..");
+      setError(error.response.message);
     }
   };
 
@@ -71,7 +80,7 @@ const Login = () => {
             />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" className="login-form-button" >
+            <Button type="primary" htmlType="submit" className="login-form-button">
               登录
             </Button>
           </Form.Item>
