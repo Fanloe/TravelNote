@@ -4,11 +4,17 @@
 // 点击游记卡片可跳转至当前游记详情页
 
 import React, { useRef, useState, useEffect } from 'react';
+import { useNavigate,useLocation } from 'react-router-dom';
+
 import 'wc-waterfall'
 import Card from '../components/Card';
 import axios from 'axios';
 
 const Home = () => {
+    let location = useLocation();
+    // const [searchKey, setSearchKey] = useState(location.state.keyword);
+    var searchKey = location.state?.keyword || '';
+    console.log(searchKey)
     var listCount = 10;//每次划到底部增加10条
     const [page, setPage] = useState(0);//当前页码
     const [posts, setPosts] = useState([]);//所有post
@@ -17,17 +23,21 @@ const Home = () => {
     useEffect(()=>{
         const fetchData = async () => {
             try{
-                const res = await axios.get(`http://localhost:8080/getNotesByStatus?status=0`);//0表示未通过 1表示已通过
+                let res = null;
+                if(searchKey == '' || searchKey == null) res = await axios.get(`http://localhost:8080/getNotesByStatus?status=0`);//0表示未通过 1表示已通过
+                else res = await axios.get(`http://localhost:8080/searchText?query=${searchKey}`);
                 console.log(res.data);
+                // setSearchKey('')
+                if(res.data.array == null && res.data.result != null) res.data.array = res.data.result;
                 setPosts(res.data.array);
-                setlazyPosts(res.data.array.slice(page*listCount, listCount));
+                setlazyPosts(res.data.array.slice(0, listCount));
                 setPage(page+1);
             }catch(err){
                 console.log(err);
             }
         }
         fetchData()
-    },[])
+    },[searchKey])
     // const posts =[
     //     {
     //         id:1,
@@ -127,14 +137,17 @@ const Home = () => {
     //     }
     // ]
     useEffect(() => {
-        if (isAtBottom && page*listCount+listCount<=posts.length) {
+        console.log(page)
+        if (isAtBottom && page*listCount<=posts.length) {
             // 加载更多数据
             // 模拟加载更多数据
             setTimeout(() => {
-                var newPosts = posts.slice(page*listCount,listCount);
+                var newPosts = posts.slice(page*listCount,(page+1)*listCount);
+                console.log(newPosts)
                 newPosts = [...lazyposts, ...newPosts];
                 setlazyPosts(newPosts);
                 setIsAtBottom(false);
+                setPage(page+1)
             }, 500)
         }
     },[isAtBottom])
