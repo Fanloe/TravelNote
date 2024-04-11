@@ -293,7 +293,7 @@ const deleteNote = async (req, res) => {
     const noteTable = db.collection(noteCollectionName);
 
     const user = await userTable.findOne({ username: username });
-    const note = await noteTable.deleteOne({ _id: ObjectId(noteId) });
+    const note = await noteTable.deleteOne({ _id: new ObjectId(noteId) });
 
     const noteIds = user["notes"];
     // console.log(noteIds);
@@ -358,7 +358,7 @@ const updateNote = async (req, res) => {
     const title = req.query.title;
     const content = req.query.content;
     const originNote = await noteTable.updateOne(
-      { _id: ObjectId(noteId) },
+      { _id: new ObjectId(noteId) },
       {
         $set: {
           // user: username,
