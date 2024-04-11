@@ -41,7 +41,7 @@ const addAudit = async (req, res) => {
 
     // const user = await userTable.findOne({ username: username });
 
-    const note = await noteTable.findOne({ _id: ObjectId(noteId) });
+    const note = await noteTable.findOne({ _id: new ObjectId(noteId) });
     const beforeStatus = note.status;
     note["status"] = afterStatus;
     console.log(note);
@@ -89,7 +89,7 @@ const getAllAudit = async (req, res) => {
 
     for (audit of audits) {
       console.log(audit.toString());
-      const note = await noteTable.findOne({ _id: ObjectId(audit.note) });
+      const note = await noteTable.findOne({ _id: new ObjectId(audit.note) });
       console.log(note);
       if (note && "title" in note) {
         audit["title"] = note.title;
@@ -124,7 +124,7 @@ const getAuditByUser = async (req, res) => {
 
     for (audit of audits) {
       console.log(audit.toString());
-      const note = await noteTable.findOne({ _id: ObjectId(audit.note) });
+      const note = await noteTable.findOne({ _id: new ObjectId(audit.note) });
       console.log(note);
       if (note && "title" in note) {
         audit["title"] = note.title;
