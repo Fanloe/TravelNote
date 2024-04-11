@@ -33,6 +33,7 @@ let routes = (app) => {
   router.get("/changeNoteStatus", noteController.changeNoteStatus);
   router.get("/searchText", noteController.searchText);
   router.patch("/updateNote", noteController.updateNote);
+  router.get("/deleteNote", noteController.deleteNote);
 
   router.get("/addAudit", auditController.addAudit);
   router.get("/getAllAudit", auditController.getAllAudit);

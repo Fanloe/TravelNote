@@ -24,7 +24,11 @@ const searchText = async (req, res) => {
     const db = client.db(dbName);
     const noteTable = db.collection(noteCollectionName);
 
-    await noteTable.createIndex({ title: "text", content: "text" });
+    await noteTable.createIndex({
+      user: "text",
+      title: "text",
+      content: "text",
+    });
 
     const result = await noteTable
       .find({ $text: { $search: searchQuery } })
@@ -241,59 +245,103 @@ const changeNoteStatus = async (req, res) => {
   }
 };
 
-const updateNote = async (req, res) => {
+const deleteNote = async (req, res) => {
   try {
     console.log(req.query);
-    //pictures
-    // await upload(req, res);
-    // let picturesId = [];
-    // req.files.forEach((picture) => {
-    //   //   console.log(picture.id.toString());
-    //   picturesId.push(picture.id.toString());
-    // });
-    var updatedDate = new Date();
+    const username = req.query.username;
+    const noteId = req.query.note;
+
     await client.connect();
     const db = client.db(dbName);
     const userTable = db.collection(userCollectionName);
     const noteTable = db.collection(noteCollectionName);
 
-    const user = await userTable.findOne({ username: req.query.username });
-    const userId = user._id.toString();
-    const username = req.query.username;
-    const title = req.query.title;
-    const content = req.query.content;
+    const user = await userTable.findOne({ username: username });
+    // const note = await noteTable.deleteOne({ _id: ObjectId(noteId) });
 
-    const note = {
-      user: username,
-      title: title,
-      content: content,
-      date: updatedDate,
-      pictures: picturesId,
-      status: 0,
-    };
+    const noteIds = user["notes"];
+    // console.log(noteIds);
 
-    const result = await noteTable.insertOne(note);
-    console.log(result);
-    const noteId = result.insertedId.toString();
-    console.log(noteId);
-    if (!("notes" in user)) {
-      user["notes"] = [noteId];
-    } else {
-      user["notes"].push(noteId);
+    var newNoteIds = [];
+    for (id of noteIds) {
+      if (id !== noteId) {
+        console.log(id);
+        console.log(noteId);
+        newNoteIds.push(id);
+      }
     }
-    const updateUser = await userTable.updateOne(
-      { _id: userId },
-      { $set: { notes: user["notes"] } }
+    // console.log(noteIds.toString());
+    console.log(newNoteIds.toString());
+    await userTable.updateOne(
+      {
+        username: username,
+      },
+      {
+        $set: {
+          notes: newNoteIds,
+        },
+      }
     );
-    // console.log(note);
+
+    const newUser = await userTable.findOne({ username: username });
+    console.log(newUser.toString());
+
     client.close();
 
     return res.send({
-      message: "Note added successfully",
+      message: "Note deleted successfully",
     });
   } catch (error) {
     return res.send({
-      message: "Error adding note",
+      message: "Error deleting note",
+      error: error.message,
+    });
+  }
+};
+
+const updateNote = async (req, res) => {
+  try {
+    console.log(req.query);
+    // pictures;
+    await upload(req, res);
+    let picturesId = [];
+    req.files.forEach((picture) => {
+      //   console.log(picture.id.toString());
+      picturesId.push(picture.id.toString());
+    });
+    var updatedDate = new Date();
+    await client.connect();
+    const db = client.db(dbName);
+    // const userTable = db.collection(userCollectionName);
+    const noteTable = db.collection(noteCollectionName);
+
+    const noteId = req.query.note;
+    // const user = await userTable.findOne({ username: req.query.username });
+    // const userId = user._id.toString();
+    const username = req.query.username;
+    const title = req.query.title;
+    const content = req.query.content;
+    const originNote = await noteTable.updateOne(
+      { _id: ObjectId(noteId) },
+      {
+        $set: {
+          // user: username,
+          title: title,
+          content: content,
+          date: updatedDate,
+          pictures: picturesId,
+          status: 0,
+        },
+      }
+    );
+    client.close();
+
+    return res.send({
+      message: "Note updated successfully",
+    });
+  } catch (error) {
+    return res.send({
+      message: "Error updating note",
       error: error.message,
     });
   }
@@ -359,6 +407,7 @@ module.exports = {
   getAllNotes,
   getNoteByUsername,
   searchText,
+  deleteNote,
   //   getListFiles,
   //   download,
 };
