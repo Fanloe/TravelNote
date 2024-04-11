@@ -9,7 +9,13 @@ const Card = (props) => {
     //{content,pictures[],status,title,user,_id}
     const navigate = useNavigate();
     const ToDetail  = (()=>{
-        navigate("/detail/"+post.id);
+        // 跳转到详情页，并传递post数据
+        let detailData = {
+            ...post,
+            authorImg:authorImg
+        }
+        console.log(detailData)
+        navigate("/detail/"+post._id,{state:detailData});
     })
     useEffect(()=>{
         console.log(post)

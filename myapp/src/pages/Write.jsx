@@ -55,6 +55,7 @@ const Write = () => {
         }
     }
     const getPostPictures = async() => {
+        if(post.pictures == null) return;
         for(var i=0;i<post.pictures.length;i++){
             let res = await getPostPicture(post.pictures[i]);
             setFileList(fileList => [...fileList, res]);
@@ -68,33 +69,40 @@ const Write = () => {
 
     //发布游记
     const log = async () => {
-        if(editorRef.current){
-            let formData = new FormData();
-            fileList.map(item => {
-                formData.append('pictures', item.originFileObj);
-            })
-            console.log(editorRef.current.getContent());
-            var newPost = {
-                ...post,
-                content:editorRef.current.getContent()
-            }
-            setPost(newPost)
-            console.log(formData)
-            console.log(fileList)
-            // 调用后端传某用户的post
-            try{
-                await fetch(`http://localhost:8080/addNote?username=${currentUser.username}&title=${post.title}&content=${newPost.content}`,
-                {
-                    method:'POST',
-                    body:formData
-                })
-            }catch(err){
-                console.log(err);
-            }
-            // 成功后跳转至我的游记页面
-            // 失败后页面提示
-            navigate('/personage')
+        if(post.title == null || editorRef.current == null || fileList.length == 0){
+            alert('标题、内容、图片均为必须输入项');
+            return;
         }
+        let formData = new FormData();
+        fileList.map(item => {
+            formData.append('pictures', item.originFileObj);
+        })
+        console.log(editorRef.current.getContent());
+        var newPost = {
+            ...post,
+            content:editorRef.current.getContent()
+        }
+        setPost(newPost)
+        console.log(formData)
+        console.log(fileList)
+        // 调用后端传某用户的post
+        if(data != null){
+            console.log(data.id)
+            navigate('/personage')
+            return;
+        }
+        try{
+            await fetch(`http://localhost:8080/addNote?username=${currentUser.username}&title=${post.title}&content=${newPost.content}`,
+            {
+                method:'POST',
+                body:formData
+            })
+        }catch(err){
+            console.log(err);
+        }
+        // 成功后跳转至我的游记页面
+        // 失败后页面提示
+        navigate('/personage')
     }
 
 
