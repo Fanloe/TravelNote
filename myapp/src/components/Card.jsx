@@ -9,14 +9,7 @@ const Card = (props) => {
     //{content,pictures[],status,title,user,_id}
     const navigate = useNavigate();
     const ToDetail  = (()=>{
-        // 跳转到详情页，并传递post数据
-        let detailData = {
-            ...post,
-            authorImg:authorImg,
-            img:img
-        }
-        console.log(detailData)
-        navigate("/detail/"+post._id,{state:detailData});
+        navigate("/detail/"+post.id);
     })
     useEffect(()=>{
         console.log(post)
@@ -40,7 +33,7 @@ const Card = (props) => {
         fetchAuthorImg();
         fetchPicture();
         console.log(img);
-    },[post])
+    },[])
     return (
         <div className='card' onClick={ToDetail}>
             <div className='post-top' key={post._id}>

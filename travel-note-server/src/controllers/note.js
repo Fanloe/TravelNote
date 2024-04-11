@@ -24,11 +24,7 @@ const searchText = async (req, res) => {
     const db = client.db(dbName);
     const noteTable = db.collection(noteCollectionName);
 
-    await noteTable.createIndex({
-      user: "text",
-      title: "text",
-      content: "text",
-    });
+    await noteTable.createIndex({ title: "text", content: "text" });
 
     const result = await noteTable
       .find({ $text: { $search: searchQuery } })
@@ -83,22 +79,16 @@ const addNote = async (req, res) => {
     console.log(result);
     const noteId = result.insertedId.toString();
     console.log(noteId);
-
-    var noteIds = [];
-
     if (!("notes" in user)) {
-      noteIds = [noteId];
+      user["notes"] = [noteId];
     } else {
-      noteIds = user["notes"];
-      console.log(noteIds);
-      noteIds.push(noteId);
+      user["notes"].push(noteId);
     }
-    console.log(noteIds);
     const updateUser = await userTable.updateOne(
-      { _id: user._id },
-      { $set: { notes: noteIds } }
+      { _id: userId },
+      { $set: { notes: user["notes"] } }
     );
-
+    // console.log(note);
     client.close();
 
     return res.send({
@@ -108,36 +98,6 @@ const addNote = async (req, res) => {
     return res.send({
       message: "Error adding note",
       error: error.message,
-    });
-  }
-};
-
-const getNoteById = async (req, res) => {
-  try {
-    const noteId = req.query.note;
-
-    await client.connect();
-    const db = client.db(dbName);
-    const noteTable = db.collection(noteCollectionName);
-    const auditTable = db.collection(auditCollectionName);
-
-    note = await noteTable.findOne({ _id: ObjectId(noteId) });
-    const audit = await auditTable.findOne({ note: noteId });
-    console.log(audit);
-    if (audit && "opinion" in audit) {
-      note["opinion"] = audit.opinion;
-    } else {
-      note["opinion"] = "No opinion";
-    }
-    console.log(note);
-    client.close();
-    return res.status(200).json({
-      message: "Get user notes successfully",
-      note,
-    });
-  } catch (error) {
-    return res.status(500).send({
-      message: error.message,
     });
   }
 };
@@ -281,103 +241,59 @@ const changeNoteStatus = async (req, res) => {
   }
 };
 
-const deleteNote = async (req, res) => {
+const updateNote = async (req, res) => {
   try {
     console.log(req.query);
-    const username = req.query.username;
-    const noteId = req.query.note;
-
+    //pictures
+    // await upload(req, res);
+    // let picturesId = [];
+    // req.files.forEach((picture) => {
+    //   //   console.log(picture.id.toString());
+    //   picturesId.push(picture.id.toString());
+    // });
+    var updatedDate = new Date();
     await client.connect();
     const db = client.db(dbName);
     const userTable = db.collection(userCollectionName);
     const noteTable = db.collection(noteCollectionName);
 
-    const user = await userTable.findOne({ username: username });
-    const note = await noteTable.deleteOne({ _id: ObjectId(noteId) });
-
-    const noteIds = user["notes"];
-    // console.log(noteIds);
-
-    var newNoteIds = [];
-    for (id of noteIds) {
-      if (id !== noteId) {
-        console.log(id);
-        console.log(noteId);
-        newNoteIds.push(id);
-      }
-    }
-    // console.log(noteIds.toString());
-    console.log(newNoteIds.toString());
-    await userTable.updateOne(
-      {
-        username: username,
-      },
-      {
-        $set: {
-          notes: newNoteIds,
-        },
-      }
-    );
-
-    const newUser = await userTable.findOne({ username: username });
-    console.log(newUser.toString());
-
-    client.close();
-
-    return res.send({
-      message: "Note deleted successfully",
-    });
-  } catch (error) {
-    return res.send({
-      message: "Error deleting note",
-      error: error.message,
-    });
-  }
-};
-
-const updateNote = async (req, res) => {
-  try {
-    console.log(req.query);
-    // pictures;
-    await upload(req, res);
-    let picturesId = [];
-    req.files.forEach((picture) => {
-      //   console.log(picture.id.toString());
-      picturesId.push(picture.id.toString());
-    });
-    var updatedDate = new Date();
-    await client.connect();
-    const db = client.db(dbName);
-    // const userTable = db.collection(userCollectionName);
-    const noteTable = db.collection(noteCollectionName);
-
-    const noteId = req.query.note;
-    // const user = await userTable.findOne({ username: req.query.username });
-    // const userId = user._id.toString();
+    const user = await userTable.findOne({ username: req.query.username });
+    const userId = user._id.toString();
     const username = req.query.username;
     const title = req.query.title;
     const content = req.query.content;
-    const originNote = await noteTable.updateOne(
-      { _id: ObjectId(noteId) },
-      {
-        $set: {
-          // user: username,
-          title: title,
-          content: content,
-          date: updatedDate,
-          pictures: picturesId,
-          status: 0,
-        },
-      }
+
+    const note = {
+      user: username,
+      title: title,
+      content: content,
+      date: updatedDate,
+      pictures: picturesId,
+      status: 0,
+    };
+
+    const result = await noteTable.insertOne(note);
+    console.log(result);
+    const noteId = result.insertedId.toString();
+    console.log(noteId);
+    if (!("notes" in user)) {
+      user["notes"] = [noteId];
+    } else {
+      user["notes"].push(noteId);
+    }
+    const updateUser = await userTable.updateOne(
+      { _id: userId },
+      { $set: { notes: user["notes"] } }
     );
+    // console.log(note);
     client.close();
 
     return res.send({
-      message: "Note updated successfully",
+      message: "Note added successfully",
     });
   } catch (error) {
     return res.send({
-      message: "Error updating note",
+      message: "Error adding note",
       error: error.message,
     });
   }
@@ -443,8 +359,6 @@ module.exports = {
   getAllNotes,
   getNoteByUsername,
   searchText,
-  deleteNote,
-  getNoteById,
   //   getListFiles,
   //   download,
 };

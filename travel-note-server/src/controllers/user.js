@@ -61,7 +61,6 @@ const register = async (req, res) => {
         name: username,
         password: password,
         authority: authority,
-        figure: "66131f250bca6d9495481d70",
       },
     });
   }

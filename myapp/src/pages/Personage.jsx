@@ -60,6 +60,7 @@ const Personage = () => {
                 }
                 const newData = res.data.array.map((item,index)=>{
                     console.log(item)
+                    
                     return{
                         id: item._id,
                         title: item.title,
@@ -68,7 +69,7 @@ const Personage = () => {
                         checkState: change(item.status),
                         img:  item.picturesBlob,
                         pictures: item.pictures,
-                        checkMes:"审核意见：" + (item.opinion || "审核中···"),
+                        checkMes:'审核意见：恭喜您，审核通过！'
                     }
                 })
                 console.log(newData);
@@ -172,7 +173,7 @@ const Personage = () => {
                                 <img src={post.img} alt='游记图片'/>
                                 <div className='person-card-container'>
                                     <div className='person-card-title'>{post.title}</div>
-                                    <div className='person-card-content'>{getText(post.content).slice(0,20)}...</div>
+                                    <div className='person-card-content'>{getText(post.content).substring(0,20)}...</div>
                                 </div>
                             </div>
                             <div className='person-card-state'>

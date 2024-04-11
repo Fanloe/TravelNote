@@ -3,7 +3,6 @@
 import React,{useState} from 'react';
 import { useLocation } from 'react-router-dom';
 import Title from './Title';
-import { useNavigate } from "react-router-dom";
 
 import Searchicon from '../img/search.png';
 import { AudioOutlined } from '@ant-design/icons';
@@ -13,10 +12,9 @@ const { Search } = Input;
 const Top = () => {
     const location = useLocation();
     const isHome = location.pathname === '/';
-    const navigate = useNavigate();
+    
     const onSearch = ((value, _e, info) => {
         console.log(info?.source, value);
-        navigate('/', { state: { keyword: value } });
     })
     return (
         <div className='top'>
