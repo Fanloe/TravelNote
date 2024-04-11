@@ -18,19 +18,20 @@ const Personage = () => {
     const { currentUser } = useContext(AuthContext);
     const [userData, setUserData] = useState({
         id: currentUser._id.slice(0,10),
-        nickname:currentUser.username,
-        avater: 'https://picsum.photos/50/50'
+        username:currentUser.username
     })
+    const [avater,setAvater] = useState({src:null});
     const [postData,setPostData] = useState([]);
+    const [refrash,setRefrash] = useState(false);
     // 请求个人信息
     useEffect(() => {
         console.log(currentUser)
         const getUserFigure = async () => {//得到用户头像
             try{
-                await fetch('http://localhost:8080/getUserFigure?username='+userData.nickname)
+                await fetch('http://localhost:8080/getUserFigure?username='+userData.username)
                 .then(response => response.blob())
                 .then(blob => {
-                    setUserData({...userData, avater: URL.createObjectURL(blob) })
+                    setAvater({src: URL.createObjectURL(blob) })
                 })
             }catch(err){
                 console.log(err)
@@ -38,7 +39,7 @@ const Personage = () => {
         }
         const getPostPicture = async(id) => {
             try{
-                var src={src:null};
+                var src;
                 await fetch('http://localhost:8080/getPicture?picture='+id)
                 .then(response => response.blob())
                 .then(blob => {
@@ -51,11 +52,11 @@ const Personage = () => {
         }
         const getUserPosts = async() => {
             try{
-                const res = await axios.get('http://localhost:8080/getUserAllNotes?username='+userData.nickname);//0表示未通过 1表示已通过
+                const res = await axios.get('http://localhost:8080/getUserAllNotes?username='+userData.username);//0表示未通过 1表示已通过
                 console.log(res.data.array);
                 for(var i=0;i<res.data.array.length;i++){
-                    res.data.array[i].pictures = await getPostPicture(res.data.array[i].pictures[0]);
-                    console.log(res.data.array[i].pictures);
+                    res.data.array[i].picturesBlob = await getPostPicture(res.data.array[i].pictures[0]);
+                    console.log(res.data.array[i].picturesBlob);
                 }
                 const newData = res.data.array.map((item,index)=>{
                     console.log(item)
@@ -65,8 +66,9 @@ const Personage = () => {
                         title: item.title,
                         content: item.content,
                         date: item.date || "",
-                        checkState: change(item.state),
-                        img:  item.pictures,
+                        checkState: change(item.status),
+                        img:  item.picturesBlob,
+                        pictures: item.pictures,
                         checkMes:'审核意见：恭喜您，审核通过！'
                     }
                 })
@@ -79,12 +81,12 @@ const Personage = () => {
 
         getUserFigure();
         getUserPosts();
-    },[])
+    },[refrash,userData])
 
 
     // const userData = {
     //     id: 1,
-    //     nickname: '张三',
+    //     username: '张三',
     //     avater: 'https://picsum.photos/50/50',
     // }
     // const postData = [
@@ -129,15 +131,33 @@ const Personage = () => {
         return doc.body.textContent
     }
     const toWrite = () => {
-        navigate('/write')
+        navigate('/write',{state:null})
+    }
+    const uploadAvater = async (e) => {
+        try{
+            const file = e.target.files[0];
+            const formData = new FormData();
+            formData.append('figures',file);
+            console.log(formData)
+            await fetch('http://localhost:8080/uploadUserFigure?username='+userData.username, {
+                method:"post",
+                body:formData
+            })
+            //刷新页面
+            setRefrash(!refrash);
+        }catch(err){
+            console.log(err)
+        }
     }
     return (
         <div className='personage-page'>
             <div className='person-info'>
                 <div className='person-avater'>
-                    <img src={userData.avater} alt='用户头像'/>
+                
+                    <input id="fileInp" type="file" hidden onChange={uploadAvater} />
+                    <img onClick={()=>{document.getElementById('fileInp').click()}} src={avater.src} alt='用户头像'/>
                     <div className='person-name-id'>
-                        <div className='person-name'>{userData.nickname}</div>
+                        <div className='person-name'>{userData.username}</div>
                         <div className='person-id'>ID: {userData.id}</div>
                     </div>
                 </div>
