@@ -24,7 +24,7 @@ const searchText = async (req, res) => {
     const db = client.db(dbName);
     const noteTable = db.collection(noteCollectionName);
 
-    await noteTable.createIndex({ title: "text", content: "text" });
+    await noteTable.createIndex({ note: "text", title: "text" });
 
     const result = await noteTable
       .find({ $text: { $search: searchQuery } })
