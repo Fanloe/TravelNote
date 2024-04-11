@@ -72,6 +72,7 @@ const Detail = () => {
         }
     
         const getPostPictures = async () => {
+            console.log(post)
             if (!post || !post.pictures) return;
             try {
                 await Promise.all(post.pictures.map(getPostPicture));
@@ -82,7 +83,7 @@ const Detail = () => {
     
         getPostPictures();
     }, [post, refrash]);
-    
+    const [once,setOnce] = useState(false);
 
 
     var settings = {
@@ -102,7 +103,7 @@ const Detail = () => {
                         <img src={Goback} alt='goback'/>
                     </div>
                     <div className='authorImg'>
-                        <img src={post.authorImg.src} alt={post.title} />
+                        <img src={post.authorImg.src} alt="头像" />
                     </div>
                     <div className='authorName'>{post.user}</div>
                 </div>
@@ -114,6 +115,11 @@ const Detail = () => {
                 <div className='detail-img'>
                     <Slider {...settings}>
                         {
+                            (post.pictures.length == 1) ? 
+                            <div className='detail-img-item'>
+                                <div className='itemm'><Image src={post.img.src} /></div>
+                            </div>
+                            :
                             pictureList.map((item,index)=>{
                                 return <div className='detail-img-item' key={index}>
                                     {/* {pictureList.length} */}

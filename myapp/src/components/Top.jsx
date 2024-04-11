@@ -16,7 +16,7 @@ const Top = () => {
     const navigate = useNavigate();
     const onSearch = ((value, _e, info) => {
         console.log(info?.source, value);
-        navigate('/search', { state: { keyword: value } });
+        navigate('/', { state: { keyword: value } });
     })
     return (
         <div className='top'>

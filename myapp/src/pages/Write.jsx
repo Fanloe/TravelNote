@@ -29,7 +29,7 @@ const Write = () => {
     let location = useLocation();
     let data = location.state;
     const [post,setPost] = useState(data || {});
-    const editorRef = useRef(null);
+    const editorRef = useRef('');
 
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
@@ -69,7 +69,7 @@ const Write = () => {
 
     //发布游记
     const log = async () => {
-        if(post.title == null || editorRef.current == null || fileList.length == 0){
+        if(post.title == undefined || editorRef.current == '' || fileList.length == 0){
             alert('标题、内容、图片均为必须输入项');
             return;
         }
@@ -86,19 +86,20 @@ const Write = () => {
         console.log(formData)
         console.log(fileList)
         // 调用后端传某用户的post
-        if(data != null){
-            console.log(data.id)
-            navigate('/personage')
-            return;
-        }
+        // if(data != null){
+        //     console.log(data.id)
+        //     navigate('/personage')
+        //     return;
+        // }
         try{
-            await fetch(`http://localhost:8080/addNote?username=${currentUser.username}&title=${post.title}&content=${newPost.content}`,
+            await axios.post(`http://localhost:8080/addNote?username=${currentUser.username}&title=${post.title}&content=${newPost.content}`,
             {
-                method:'POST',
+                // method:'POST',
                 body:formData
             })
         }catch(err){
             console.log(err);
+            alert("发布失败");
         }
         // 成功后跳转至我的游记页面
         // 失败后页面提示
