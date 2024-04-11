@@ -5,11 +5,10 @@ import {
   useLocation,
 } from "react-router-dom";
 import routes from './router/router'
-import { Layout, Menu, Button, ConfigProvider, Avatar, Dropdown} from 'antd'
-import { PageHeader } from '@ant-design/pro-layout';
+import { Layout, Menu, Button, ConfigProvider, Avatar, Dropdown} from 'antd';
 import { UserOutlined, SettingOutlined,FullscreenOutlined, FullscreenExitOutlined } from '@ant-design/icons';
 import './css/style.css';
-
+import { useUser } from './context/userContext.js'
 
 const { Header, Sider, Content, Footer } = Layout
 
@@ -28,6 +27,8 @@ const menu = (
 
 function App() {
   const location = useLocation();
+  const { user } = useUser();
+  const { setUser } = useUser();
   const shouldRenderSidebarAndHeader = !['/', '/register'].includes(location.pathname);
   //隐藏样式的页面
   let element = useRoutes(routes)
@@ -102,6 +103,22 @@ function App() {
     setIsFullscreen(false);
   };
 
+  const [image, setImage] = useState({src:null}); 
+
+  useEffect(() => {
+    const getUserFigure = async () => {
+      try {
+        const response = await fetch(`http://localhost:8080/getUserFigure?username=${user.username}`);
+        const blob = await response.blob();
+        setImage({ src: URL.createObjectURL(blob) });
+        //console.log(refrash);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getUserFigure();
+  }, [user]);
+
 
   return(
     <ConfigProvider
@@ -137,7 +154,11 @@ function App() {
             />
             <Dropdown overlay={menu} trigger={['click']}>
               <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-                <Avatar style={{ backgroundColor: '#ffffff' }} icon={<UserOutlined />} />
+                {image ? (
+                    <Avatar src={image.src} />
+                ) : (
+                    <Avatar icon={<UserOutlined />} />
+                )}
               </a>
             </Dropdown>
           </div>
