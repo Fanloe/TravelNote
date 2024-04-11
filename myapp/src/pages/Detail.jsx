@@ -36,7 +36,6 @@ const Detail = () => {
     const [refrash,setRefrash] = useState(false);
     let post = location.state;
     const [pictureList,setPictureList] = useState([]);
-    const [images,setImages] = useState([])
    
     // useEffect(()=>{
     //     const getPostPicture = async(id) => {
@@ -73,6 +72,7 @@ const Detail = () => {
         }
     
         const getPostPictures = async () => {
+            console.log(post)
             if (!post || !post.pictures) return;
             try {
                 await Promise.all(post.pictures.map(getPostPicture));
@@ -82,9 +82,8 @@ const Detail = () => {
         }
     
         getPostPictures();
-        setImages(pictureList)
     }, [post, refrash]);
-    
+    const [once,setOnce] = useState(false);
 
 
     var settings = {
@@ -116,7 +115,12 @@ const Detail = () => {
                 <div className='detail-img'>
                     <Slider {...settings}>
                         {
-                            images.map((item,index)=>{
+                            (post.pictures.length == 1) ? 
+                            <div className='detail-img-item'>
+                                <div className='itemm'><Image src={post.img.src} /></div>
+                            </div>
+                            :
+                            pictureList.map((item,index)=>{
                                 return <div className='detail-img-item' key={index}>
                                     {/* {pictureList.length} */}
                                     <div className='itemm'><Image src={item} /></div>
