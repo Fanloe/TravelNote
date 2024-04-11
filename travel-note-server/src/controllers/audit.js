@@ -82,10 +82,23 @@ const getAllAudit = async (req, res) => {
     // const username = req.query.user;
     await client.connect();
     const db = client.db(dbName);
-    // const noteTable = db.collection(noteCollectionName);
+    const noteTable = db.collection(noteCollectionName);
     const auditTable = db.collection(auditCollectionName);
 
     const audits = await auditTable.find({}).toArray();
+
+    for (audit of audits) {
+      console.log(audit.toString());
+      const note = await noteTable.findOne({ _id: ObjectId(audit.note) });
+      console.log(note);
+      if (note && "title" in note) {
+        audit["title"] = note.title;
+      } else {
+        audit["title"] = "No title";
+      }
+      console.log(audit.toString());
+    }
+
     console.log(audits);
     client.close();
 
@@ -104,10 +117,23 @@ const getAuditByUser = async (req, res) => {
     const username = req.query.user;
     await client.connect();
     const db = client.db(dbName);
-    // const noteTable = db.collection(noteCollectionName);
+    const noteTable = db.collection(noteCollectionName);
     const auditTable = db.collection(auditCollectionName);
 
     const audits = await auditTable.find({ auditor: username }).toArray();
+
+    for (audit of audits) {
+      console.log(audit.toString());
+      const note = await noteTable.findOne({ _id: ObjectId(audit.note) });
+      console.log(note);
+      if (note && "title" in note) {
+        audit["title"] = note.title;
+      } else {
+        audit["title"] = "No title";
+      }
+      console.log(audit.toString());
+    }
+
     console.log(audits);
     client.close();
 
