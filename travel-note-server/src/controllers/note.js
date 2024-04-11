@@ -121,7 +121,7 @@ const getNoteById = async (req, res) => {
     const noteTable = db.collection(noteCollectionName);
     const auditTable = db.collection(auditCollectionName);
 
-    note = await noteTable.findOne({ _id: ObjectId(noteId) });
+    note = await noteTable.findOne({ _id: new ObjectId(noteId) });
     const audit = await auditTable.findOne({ note: noteId });
     console.log(audit);
     if (audit && "opinion" in audit) {
@@ -293,7 +293,7 @@ const deleteNote = async (req, res) => {
     const noteTable = db.collection(noteCollectionName);
 
     const user = await userTable.findOne({ username: username });
-    const note = await noteTable.deleteOne({ _id: ObjectId(noteId) });
+    const note = await noteTable.deleteOne({ _id: new ObjectId(noteId) });
 
     const noteIds = user["notes"];
     // console.log(noteIds);
@@ -358,7 +358,7 @@ const updateNote = async (req, res) => {
     const title = req.query.title;
     const content = req.query.content;
     const originNote = await noteTable.updateOne(
-      { _id: ObjectId(noteId) },
+      { _id: new ObjectId(noteId) },
       {
         $set: {
           // user: username,
