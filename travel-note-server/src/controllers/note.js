@@ -24,11 +24,13 @@ const searchText = async (req, res) => {
     const db = client.db(dbName);
     const noteTable = db.collection(noteCollectionName);
 
-    await noteTable.createIndex({
-      user: "text",
-      title: "text",
-      content: "text",
-    });
+    const indexes = noteTable.indexInformation();
+    if ("user_text_title_text_content_text" in indexes)
+      await noteTable.createIndex({
+        user: "text",
+        title: "text",
+        content: "text",
+      });
 
     const result = await noteTable
       .find({ $text: { $search: searchQuery } })
@@ -55,7 +57,7 @@ const addNote = async (req, res) => {
     await upload(req, res);
     let picturesId = [];
     req.files.forEach((picture) => {
-      //   console.log(picture.id.toString());
+        console.log(picture.id.toString());
       picturesId.push(picture.id.toString());
     });
     var updatedDate = new Date();
@@ -101,11 +103,11 @@ const addNote = async (req, res) => {
 
     client.close();
 
-    return res.send({
+    return res.status(200).send({
       message: "Note added successfully",
     });
   } catch (error) {
-    return res.send({
+    return res.status(500).send({
       message: "Error adding note",
       error: error.message,
     });
@@ -296,15 +298,18 @@ const deleteNote = async (req, res) => {
     const note = await noteTable.deleteOne({ _id: new ObjectId(noteId) });
 
     const noteIds = user["notes"];
-    // console.log(noteIds);
+    console.log(noteIds);
 
     var newNoteIds = [];
+    if(noteIds){
+      
     for (id of noteIds) {
       if (id !== noteId) {
         console.log(id);
         console.log(noteId);
         newNoteIds.push(id);
       }
+    }
     }
     // console.log(noteIds.toString());
     console.log(newNoteIds.toString());
@@ -376,7 +381,7 @@ const updateNote = async (req, res) => {
       message: "Note updated successfully",
     });
   } catch (error) {
-    return res.send({
+    return res.status(400).send({
       message: "Error updating note",
       error: error.message,
     });

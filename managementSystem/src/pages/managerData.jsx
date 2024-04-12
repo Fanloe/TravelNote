@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Breadcrumb, Layout, Button, theme, Descriptions, Avatar, Upload, Tooltip } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 import { UserOutlined } from '@ant-design/icons';
 import { useUser } from '../context/userContext.js';
 import axios from 'axios';
@@ -14,11 +14,10 @@ const ManagerData = () =>{
         token: { colorBgContainer, borderRadiusLG },
       } = theme.useToken();
 
-    const handleLogout = () => {
-        console.log('退出登录');
-    }
+      const navigate = useNavigate();
 
     const handleSignout = () => {
+        navigate('/');
         console.log('注销账号');
     }
 
@@ -37,8 +36,8 @@ const ManagerData = () =>{
         },
         {
           key: '3',
-          label: 'Remark',
-          children: 'empty',
+          label: '用户头像',
+          children: '如右图',
         },
         {
           key: '4',
@@ -46,11 +45,7 @@ const ManagerData = () =>{
           span: 2,
           children:  (user.authority===1) ? '可以执行审核支持的操作（通过、拒绝）' : '可以执行系统所有支持的操作（通过、拒绝、删除）' ,
         },
-        {
-          key: '5',
-          label: 'Remark',
-          children: 'empty',
-        },
+
       ];
 
       const [image, setImage] = useState({src:null}); 
@@ -149,9 +144,6 @@ const ManagerData = () =>{
                     <br />
                     <Button type="default" style={{marginLeft:30}} onClick={() => handleSignout()}>
                         退出登录
-                    </Button>
-                    <Button type="default" style={{marginLeft:30}} onClick={() => handleLogout()}>
-                        注销账号
                     </Button>
                 </div>
                 
