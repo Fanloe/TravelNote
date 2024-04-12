@@ -9,51 +9,23 @@ import {
   Avatar, 
   Input, 
   Descriptions,
-  Modal } from 'antd';
+  Modal,
+  Carousel } from 'antd';
 import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
-import image1 from '../images/test1.jpg'
-import image2 from '../images/test1.jpg'
-import image3 from '../images/test1.jpg'
 import { useNavigate, Link, useParams } from 'react-router-dom';
 import axios from 'axios';
+import { useUser } from '../context/userContext.js';
 
 const { TextArea } = Input;
 const { Meta} = Card;
 const { Content } = Layout;
 
-const images = [
-  'image1.jpg', // 你的图片URL
-  'image2.jpg',
-  'image3.jpg',
-  // 添加更多图片URL
-];
 
-const items = [
-  {
-    key: '1',
-    label: '用户名称',
-    children: 'Zhou Maomao',
-  },
-  {
-    key: '2',
-    label: '游记标题',
-    children: '标题标题标',
-  },
-  {
-    key: '3',
-    label: '审核状态',
-    children: '待审核',
-  },
-  {
-    key: '4',
-    label: '游记内容',
-    span: 2,
-    children: '文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本文本',
-  },
-];
+
 
 const Travelnote = () => {
   const { id } = useParams(); // 获取路由参数中的作品ID
+  const { user } = useUser();
 
   const navigate = useNavigate()
   const [textAreaValue, setTextAreaValue] = useState('');
@@ -62,7 +34,7 @@ const Travelnote = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
 
   const modalText = '请问您确定要删除该作品吗？';
-  const userRole = 'admin';
+  
 
   
   const showModal = () => {
@@ -89,8 +61,13 @@ const Travelnote = () => {
     setTextAreaValue(event.target.value);
   };
 
-  const sendToBackend = (action) => {
-    // 模拟发送数据到后端的操作
+  const sendToBackend = async (action) => {
+    try {
+      const status  = action === 'approve' ? '1' : (action === 'reject' ? '2' : '3');
+      const response = await axios.get(`http://localhost:8080/addAudit?note=${id}&user=${user.username}&status=${status}&opinion=${textAreaValue}`);
+    } catch (err) {
+      console.log(err);
+    }
     console.log(`Action: ${action}, Text: ${textAreaValue}`);
   };
 
@@ -101,17 +78,20 @@ const Travelnote = () => {
       return; 
     }else if (action === 'reject' && textAreaValue.trim()){
       message.success(`作品已拒绝`);
+      sendToBackend(action);
       navigate('/management');
     }
     else if (action === 'delete'){
       message.warning(`作品已删除`);
+      sendToBackend(action);
       navigate('/management');
     }else{
       message.success(`作品已通过审核`);
+      sendToBackend(action);
       navigate('/management');
     }
     setIsTextareaRequired(false); 
-    sendToBackend(action);
+    
   }
 
   const {
@@ -120,21 +100,78 @@ const Travelnote = () => {
 
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [images, setImages] = useState([]);
+  const [image, setImage ] = useState(null);
 
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/getNoteDetails/${id}`);
-        setDetails(response.data); // 假设后端直接返回了作品的详细信息
+        const response = await axios.get(`http://localhost:8080/getNoteById?note=${id}`);
+        setDetails(response.data.note); 
+
+
+        const imageBlobsPromises = response.data.note.pictures.map(async (pictureId) => {
+          const imageResponse = await axios.get(`http://localhost:8080/getPicture?picture=${pictureId}`, { responseType: 'blob' });
+          // 将Blob数据转换为URL
+          const imageUrl = URL.createObjectURL(imageResponse.data);
+          return imageUrl;
+        });
+  
+        const imageUrls = await Promise.all(imageBlobsPromises);
+        setImages(imageUrls); 
       } catch (error) {
         console.error('Failed to fetch details:', error);
       }
+
+      const getUserFigure = async () => {
+          const response = await fetch(`http://localhost:8080/getUserFigure?username=${response.data.note.user}`);
+          const blob = await response.blob();
+          setImage({ src: URL.createObjectURL(blob) });
+      
     };
+  }
 
     fetchDetails();
+
   }, [id]);
 
+  let dynamicItems = [];
+  if (details) {
+    dynamicItems = [
+      {
+        key: '1',
+        label: '用户名称',
+        children: details.user,
+      },
+      {
+        key: '2',
+        label: '游记标题',
+        children: details.title,
+      },
+      {
+        key: '5',
+        label: '发布时间',
+        children: details.date,
+      },
+      {
+        key: '3',
+        label: '审核状态',
+        children: details.status === 0 ? '待审核' : (details.status === 1 ? '已通过' : '未通过'), 
+      },
+      {
+        key: '4',
+        label: '游记内容',
+        span: 2,
+        children: details.content,
+      },
+      
+      
+    ];
+  }
 
+  if (!details) {
+    return <div>Loading...</div>; 
+  }
 
   
   return (
@@ -176,30 +213,33 @@ const Travelnote = () => {
             borderRadius: borderRadiusLG,
           }}
         >
-          <Card
-            style={{
-              width: '35%',
-              height: '35%',
-            }}
-            loading={false}
-            hoverable={true}
-            cover={
-              <img
-                alt="test"
-                src={image1}
+           <Card
+              style={{
+                width: '35%',
+                height: '35%',
+              }}
+              loading={false}
+              hoverable={true}
+              cover={
+                <Carousel autoplay>
+                  {images.map((url, index) => (
+                    <div key={index}>
+                      <img src={url} alt={`slide-${index}`} style={{ width: '100%', height: 'auto' }} />
+                    </div>
+                  ))}
+                </Carousel>
+              }
+              actions={[
+                <SettingOutlined key="setting" />,
+                <EditOutlined key="edit" />,
+                <EllipsisOutlined key="ellipsis" />,
+              ]}
+            >
+              <Meta
+                avatar={<Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=8" />}
+                title={details.title}
+                description={details.content}
               />
-            }
-            actions={[
-              <SettingOutlined key="setting" />,
-              <EditOutlined key="edit" />,
-              <EllipsisOutlined key="ellipsis" />,
-            ]}>
-            
-            <Meta
-              avatar={<Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=8" />}
-              title="Card title"
-              description="This is the description"
-            />
             
           </Card>
           <div style={{ 
@@ -209,7 +249,7 @@ const Travelnote = () => {
             <Descriptions 
               title="作品详情" 
               layout="vertical" 
-              items={items}
+              items={dynamicItems}
               style={{ marginTop:'10%'}} />
             
             <h3>审核意见</h3>
@@ -228,7 +268,7 @@ const Travelnote = () => {
               <Button danger onClick={() => handleAction('reject')}>
                 拒绝
               </Button>
-              {userRole === 'admin' && (<Button type="primary" danger onClick={() => showModal()}>
+              {user.authority === '2' && (<Button type="primary" danger onClick={() => showModal()}>
                 删除
               </Button>)}
               <Modal
