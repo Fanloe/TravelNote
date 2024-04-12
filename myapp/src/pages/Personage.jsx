@@ -9,8 +9,8 @@ import { AuthContext } from "../context/authContext";
 
 function change(state){
     if(state==1) return '已通过';
-    else if(state==0) return '未通过';
-    else return '待审核';
+    else if(state==0) return '待审核';
+    else return '未通过';
 }
 
 const Personage = () => {
@@ -68,7 +68,7 @@ const Personage = () => {
                         checkState: change(item.status),
                         img:  item.picturesBlob,
                         pictures: item.pictures,
-                        checkMes:"审核意见：" + (item.opinion || "审核中···"),
+                        checkMes:"审核意见：" + change(item.status)//(item.opinion || "审核中···"),
                     }
                 })
                 console.log(newData);

@@ -234,7 +234,7 @@ const getUserAllNotes = async (req, res) => {
     // client.close();
 
     const noteTable = db.collection(noteCollectionName);
-    const array = await noteTable.find({ user: userId }).toArray();
+    const array = await noteTable.find({ user: username }).toArray();
     console.log(array);
     // await mongoClient.connect();
     client.close();

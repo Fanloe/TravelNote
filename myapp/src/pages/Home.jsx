@@ -24,7 +24,7 @@ const Home = () => {
         const fetchData = async () => {
             try{
                 let res = null;
-                if(searchKey == '' || searchKey == null) res = await axios.get(`http://localhost:8080/getNotesByStatus?status=0`);//0表示未通过 1表示已通过
+                if(searchKey == '' || searchKey == null) res = await axios.get(`http://localhost:8080/getNotesByStatus?status=1`);//0表示未通过 1表示已通过
                 else res = await axios.get(`http://localhost:8080/searchText?query=${searchKey}`);
                 console.log(res.data);
                 // setSearchKey('')

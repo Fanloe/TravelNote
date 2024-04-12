@@ -86,21 +86,32 @@ const Write = () => {
         console.log(formData)
         console.log(fileList)
         // 调用后端传某用户的post
-        // if(data != null){
-        //     console.log(data.id)
-        //     navigate('/personage')
-        //     return;
-        // }
-        try{
-            await axios.post(`http://localhost:8080/addNote?username=${currentUser.username}&title=${post.title}&content=${newPost.content}`,
-            {
-                // method:'POST',
-                body:formData
-            })
-        }catch(err){
-            console.log(err);
-            alert("发布失败");
+        if(data != null){
+            console.log(data.id)
+            try{
+                await fetch(`http://localhost:8080/updateNote?note=${data.id}&username=${currentUser.username}&title=${post.title}&content=${newPost.content}`,
+                {
+                    method:'POST',
+                    body:formData
+                })
+            }catch(err){
+                console.log(err);
+                alert("更新失败");
+            }
         }
+        else{
+            try{
+                await fetch(`http://localhost:8080/addNote?username=${currentUser.username}&title=${post.title}&content=${newPost.content}`,
+                {
+                    method:'POST',
+                    body:formData
+                })
+            }catch(err){
+                console.log(err);
+                alert("发布失败");
+            }
+        }
+        
         // 成功后跳转至我的游记页面
         // 失败后页面提示
         navigate('/personage')
