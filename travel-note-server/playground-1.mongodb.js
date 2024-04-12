@@ -10,3 +10,8 @@ db.createCollection(note);
 db.createCollection(user);
 db.createCollection(pictures + ".chunks");
 db.createCollection(pictures + ".files");
+db.Collection(note).createIndex({
+  user: "text",
+  title: "text",
+  content: "text",
+});
