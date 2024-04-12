@@ -57,7 +57,7 @@ const addNote = async (req, res) => {
     await upload(req, res);
     let picturesId = [];
     req.files.forEach((picture) => {
-        console.log(picture.id.toString());
+      console.log(picture.id.toString());
       picturesId.push(picture.id.toString());
     });
     var updatedDate = new Date();
@@ -71,6 +71,7 @@ const addNote = async (req, res) => {
     const username = req.query.username;
     const title = req.query.title;
     const content = req.query.content;
+    const opinion = "No opinion";
 
     const note = {
       user: username,
@@ -79,6 +80,7 @@ const addNote = async (req, res) => {
       date: updatedDate,
       pictures: picturesId,
       status: 0,
+      opinion: opinion,
     };
 
     const result = await noteTable.insertOne(note);
@@ -124,13 +126,13 @@ const getNoteById = async (req, res) => {
     const auditTable = db.collection(auditCollectionName);
 
     note = await noteTable.findOne({ _id: new ObjectId(noteId) });
-    const audit = await auditTable.findOne({ note: noteId });
-    console.log(audit);
-    if (audit && "opinion" in audit) {
-      note["opinion"] = audit.opinion;
-    } else {
-      note["opinion"] = "No opinion";
-    }
+    // const audit = await auditTable.findOne({ note: noteId });
+    // console.log(audit);
+    // if (audit && "opinion" in audit) {
+    //   note["opinion"] = audit.opinion;
+    // } else {
+    //   note["opinion"] = "No opinion";
+    // }
     console.log(note);
     client.close();
     return res.status(200).json({
@@ -154,18 +156,18 @@ const getNoteByUsername = async (req, res) => {
     let array = [];
     array = await noteTable.find({ user: username }).toArray();
 
-    const auditTable = db.collection(auditCollectionName);
-    for (note of array) {
-      // console.log(note);
-      const audit = await auditTable.findOne({ note: note._id.toString() });
-      console.log(audit);
-      if (audit && "opinion" in audit) {
-        note["opinion"] = audit.opinion;
-      } else {
-        note["opinion"] = "No opinion";
-      }
-      console.log(note);
-    }
+    // const auditTable = db.collection(auditCollectionName);
+    // for (note of array) {
+    //   // console.log(note);
+    //   const audit = await auditTable.findOne({ note: note._id.toString() });
+    //   console.log(audit);
+    //   if (audit && "opinion" in audit) {
+    //     note["opinion"] = audit.opinion;
+    //   } else {
+    //     note["opinion"] = "No opinion";
+    //   }
+    //   console.log(note);
+    // }
     client.close();
     return res.status(200).json({
       message: "Get user notes successfully",
@@ -249,6 +251,10 @@ const changeNoteStatus = async (req, res) => {
     // const statusOfNotes = 1;
     const changeToStatus = req.query.status;
     const noteId = req.query.note;
+    var newOpinion = null;
+    if ("opinion" in req.query) {
+      newOpinion = req.query.opinion;
+    }
 
     await client.connect();
     const db = client.db(dbName);
@@ -261,13 +267,13 @@ const changeNoteStatus = async (req, res) => {
     // client.close();
 
     const noteTable = db.collection(noteCollectionName);
-    const note = await noteTable.findOne({ _id: noteId });
+    const note = await noteTable.findOne({ _id: new ObjectId(noteId) });
     console.log(note);
     note.status = Number(changeToStatus);
 
     await noteTable.updateOne(
       { _id: noteId },
-      { $set: { status: changeToStatus } }
+      { $set: { status: changeToStatus, opinion: newOpinion } }
     );
     // await mongoClient.connect();
     client.close();
@@ -301,15 +307,14 @@ const deleteNote = async (req, res) => {
     console.log(noteIds);
 
     var newNoteIds = [];
-    if(noteIds){
-      
-    for (id of noteIds) {
-      if (id !== noteId) {
-        console.log(id);
-        console.log(noteId);
-        newNoteIds.push(id);
+    if (noteIds) {
+      for (id of noteIds) {
+        if (id !== noteId) {
+          console.log(id);
+          console.log(noteId);
+          newNoteIds.push(id);
+        }
       }
-    }
     }
     // console.log(noteIds.toString());
     console.log(newNoteIds.toString());
