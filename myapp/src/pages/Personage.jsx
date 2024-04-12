@@ -80,7 +80,7 @@ const Personage = () => {
 
         getUserFigure();
         getUserPosts();
-    },[userData])
+    },[refrash,userData])
 
 
     // const userData = {
@@ -152,7 +152,7 @@ const Personage = () => {
     const deletePost = async (id) => {
         try{
             console.log(id);
-            await axios.delete('http://localhost:8080/deleteNote?username='+userData.username+'&note='+id)
+            await axios.get('http://localhost:8080/deleteNote?username='+userData.username+'&note='+id)
             setRefrash(!refrash);
             
         }catch(err){
