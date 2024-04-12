@@ -37,6 +37,7 @@ note:
         1: "已通过",  Approved
         2: "未通过",  Rejected
         3: "已删除"}    Deleted
+    - opinion: 
 pictures:
     - pictures._id
 audit:
