@@ -32,7 +32,7 @@ const ManagerData = () =>{
         {
           key: '2',
           label: '用户角色',
-          children: (user.authority===1) ? '审核员':'管理员' ,
+          children: (user.authority === '1') ? '审核员':'管理员' ,
         },
         {
           key: '3',
@@ -43,7 +43,7 @@ const ManagerData = () =>{
           key: '4',
           label: '用户权限描述',
           span: 2,
-          children:  (user.authority===1) ? '可以执行审核支持的操作（通过、拒绝）' : '可以执行系统所有支持的操作（通过、拒绝、删除）' ,
+          children:  (user.authority === '1') ? '可以执行审核支持的操作（通过、拒绝）' : '可以执行系统所有支持的操作（通过、拒绝、删除）' ,
         },
 
       ];
@@ -75,6 +75,10 @@ const ManagerData = () =>{
         const getUserFigure = async () => {
           try {
             const response = await fetch(`http://localhost:8080/getUserFigure?username=${user.username}`);
+            if (!response.ok){
+              console.log("Failed to fetch user figure: ", response.status);
+              return;
+            }
             const blob = await response.blob();
             setImage({ src: URL.createObjectURL(blob) });
           } catch (err) {
@@ -132,7 +136,7 @@ const ManagerData = () =>{
                                     showUploadList={false}
                                     beforeUpload={handleUpload}
                                     >
-                                    {image ? (
+                                    {image.src ? (
                                         <Avatar size={200} src={image.src} />
                                     ) : (
                                         <Avatar size={200} icon={<UserOutlined />} />

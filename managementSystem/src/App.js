@@ -109,6 +109,10 @@ function App() {
     const getUserFigure = async () => {
       try {
         const response = await fetch(`http://localhost:8080/getUserFigure?username=${user.username}`);
+        if (!response.ok){
+          console.log("Failed to fetch user figure: ", response.status);
+          return;
+        }
         const blob = await response.blob();
         setImage({ src: URL.createObjectURL(blob) });
         //console.log(refrash);
@@ -154,7 +158,7 @@ function App() {
             />
             <Dropdown overlay={menu} trigger={['click']}>
               <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-                {image ? (
+                {image.src ? (
                     <Avatar src={image.src} />
                 ) : (
                     <Avatar icon={<UserOutlined />} />

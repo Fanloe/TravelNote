@@ -1,47 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Breadcrumb, Layout, Card, Row, Statistic, Col } from 'antd';
 import { Link } from 'react-router-dom';
 import ReactEcharts from 'echarts-for-react';
 import {
     UserOutlined,
     MessageOutlined,
-    ShoppingOutlined,
-    PayCircleOutlined,
+    InboxOutlined,
+    UsergroupAddOutlined,
   } from '@ant-design/icons';
-
+import axios from 'axios';
 
 const { Content } = Layout;
 
-const data = [
-    {
-      title: 'New Visits',
-      value: 102400,
-      icon: <UserOutlined />,
-      color: 'green',
-    },
-    {
-      title: 'Messages',
-      value: 81212,
-      icon: <MessageOutlined />,
-      color: 'blue',
-    },
-    {
-      title: 'Purchases',
-      value: 9280,
-      icon: <PayCircleOutlined />,
-      color: 'red',
-    },
-    {
-      title: 'Shopping',
-      value: 13600,
-      icon: <ShoppingOutlined />,
-      color: 'orange',
-    },
-  ];
-
 const option = {
     title: {
-        text: 'Stacked Area Chart'
+        text: '不同类型游记占比'
       },
     legend: {
         top: 'bottom',
@@ -59,21 +32,21 @@ const option = {
         {
         name: 'Nightingale Chart',
         type: 'pie',
-        radius: [20, 150],
+        radius: [20, 120],
         center: ['50%', '50%'],
         roseType: 'area',
         itemStyle: {
             borderRadius: 8
         },
         data: [
-            { value: 40, name: 'rose 1' },
-            { value: 38, name: 'rose 2' },
-            { value: 32, name: 'rose 3' },
-            { value: 30, name: 'rose 4' },
-            { value: 28, name: 'rose 5' },
-            { value: 26, name: 'rose 6' },
-            { value: 22, name: 'rose 7' },
-            { value: 18, name: 'rose 8' }
+            { value: 40, name: '文化探索' },
+            { value: 38, name: '自然与野生动植物' },
+            { value: 32, name: '美食之旅' },
+            { value: 30, name: '城市漫步' },
+            { value: 28, name: '冒险旅行' },
+            { value: 26, name: '灵修之旅' },
+            { value: 22, name: '奢华旅行' },
+            { value: 18, name: '背包客之旅 ' }
         ]
         }
     ]
@@ -81,7 +54,7 @@ const option = {
 
 const option2 = {
     title: {
-        text: 'Stacked Area Chart'
+        text: '各类型游记数据变化'
       },
     tooltip: {
       trigger: 'axis',
@@ -120,7 +93,7 @@ const option2 = {
     ],
     series: [
       {
-        name: 'Direct',
+        name: '文化探索',
         type: 'bar',
         emphasis: {
           focus: 'series'
@@ -128,7 +101,7 @@ const option2 = {
         data: [320, 332, 301, 334, 390, 330, 320]
       },
       {
-        name: 'Email',
+        name: '自然与野生动植物',
         type: 'bar',
         stack: 'Ad',
         emphasis: {
@@ -137,7 +110,7 @@ const option2 = {
         data: [120, 132, 101, 134, 90, 230, 210]
       },
       {
-        name: 'Union Ads',
+        name: '美食之旅',
         type: 'bar',
         stack: 'Ad',
         emphasis: {
@@ -146,7 +119,7 @@ const option2 = {
         data: [220, 182, 191, 234, 290, 330, 310]
       },
       {
-        name: 'Video Ads',
+        name: '城市漫步',
         type: 'bar',
         stack: 'Ad',
         emphasis: {
@@ -155,7 +128,7 @@ const option2 = {
         data: [150, 232, 201, 154, 190, 330, 410]
       },
       {
-        name: 'Search Engine',
+        name: '冒险旅行',
         type: 'bar',
         data: [862, 1018, 964, 1026, 1679, 1600, 1570],
         emphasis: {
@@ -169,7 +142,7 @@ const option2 = {
         }
       },
       {
-        name: 'Baidu',
+        name: '灵修之旅',
         type: 'bar',
         barWidth: 5,
         stack: 'Search Engine',
@@ -179,7 +152,7 @@ const option2 = {
         data: [620, 732, 701, 734, 1090, 1130, 1120]
       },
       {
-        name: 'Google',
+        name: '奢华旅行',
         type: 'bar',
         stack: 'Search Engine',
         emphasis: {
@@ -188,7 +161,7 @@ const option2 = {
         data: [120, 132, 101, 134, 290, 230, 220]
       },
       {
-        name: 'Bing',
+        name: '背包客之旅',
         type: 'bar',
         stack: 'Search Engine',
         emphasis: {
@@ -196,21 +169,12 @@ const option2 = {
         },
         data: [60, 72, 71, 74, 190, 130, 110]
       },
-      {
-        name: 'Others',
-        type: 'bar',
-        stack: 'Search Engine',
-        emphasis: {
-          focus: 'series'
-        },
-        data: [62, 82, 91, 84, 109, 110, 120]
-      }
     ]
   };
 
   const option3 = {
     title: {
-      text: 'Stacked Area Chart'
+      text: '近日数据变化'
     },
     tooltip: {
       trigger: 'axis',
@@ -222,7 +186,7 @@ const option2 = {
       }
     },
     legend: {
-      data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
+      data: ['用户人数', '游记数量', '图片数量', '管理员数量', '日志数量']
     },
     toolbox: {
       feature: {
@@ -249,7 +213,7 @@ const option2 = {
     ],
     series: [
       {
-        name: 'Email',
+        name: '用户人数',
         type: 'line',
         stack: 'Total',
         areaStyle: {},
@@ -259,7 +223,7 @@ const option2 = {
         data: [120, 132, 101, 134, 90, 230, 210]
       },
       {
-        name: 'Union Ads',
+        name: '游记数量',
         type: 'line',
         stack: 'Total',
         areaStyle: {},
@@ -269,7 +233,7 @@ const option2 = {
         data: [220, 182, 191, 234, 290, 330, 310]
       },
       {
-        name: 'Video Ads',
+        name: '图片数量',
         type: 'line',
         stack: 'Total',
         areaStyle: {},
@@ -279,7 +243,7 @@ const option2 = {
         data: [150, 232, 201, 154, 190, 330, 410]
       },
       {
-        name: 'Direct',
+        name: '管理员数量',
         type: 'line',
         stack: 'Total',
         areaStyle: {},
@@ -289,7 +253,7 @@ const option2 = {
         data: [320, 332, 301, 334, 390, 330, 320]
       },
       {
-        name: 'Search Engine',
+        name: '日志数量',
         type: 'line',
         stack: 'Total',
         label: {
@@ -305,7 +269,53 @@ const option2 = {
     ]
   };
 
+
+
+
+
 const Home = () =>{
+
+  const [ count, setCount ] = useState(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8080/count`);
+        setCount(response.data.data);
+        
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    };
+    
+    fetchData();
+  }, []);
+
+  const data = count ? [
+    {
+      title: '用户数量',
+      value: count.normalUser,
+      icon: <UserOutlined />,
+      color: 'green',
+    },
+    {
+      title: '游记数量',
+      value: count.noteNum,
+      icon: <MessageOutlined />,
+      color: 'blue',
+    },
+    {
+      title: '管理人员',
+      value: count.auditorNum,
+      icon: <UsergroupAddOutlined />,
+      color: 'red',
+    },
+    {
+      title: '日志条数',
+      value: count.auditNum,
+      icon: <InboxOutlined />,
+      color: 'orange',
+    },
+  ] : [];
     
     return (
         <Layout>

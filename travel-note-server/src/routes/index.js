@@ -34,6 +34,7 @@ let routes = (app) => {
   router.post("/updateNote", noteController.updateNote);
   router.get("/deleteNote", noteController.deleteNote);
   router.get("/getNoteById", noteController.getNoteById);
+  router.get("/count", userController.countAll);
 
   router.get("/changeNoteStatus", noteController.changeNoteStatus);
   router.get("/addAudit", auditController.addAudit);

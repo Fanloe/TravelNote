@@ -23,7 +23,6 @@ const { Content } = Layout;
 
 
 
-
 const Travelnote = () => {
   const { id } = useParams(); // 获取路由参数中的作品ID
   const { user } = useUser();
@@ -35,8 +34,6 @@ const Travelnote = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
 
   const modalText = '请问您确定要删除该作品吗？';
-  
-
   
   const showModal = () => {
     setIsTextareaRequired(false);
@@ -108,8 +105,8 @@ const Travelnote = () => {
     const fetchDetails = async () => {
       try {
         const response = await axios.get(`http://localhost:8080/getNoteById?note=${id}`);
+        console.log(response.data.note);
         setDetails(response.data.note); 
-
 
         const imageBlobsPromises = response.data.note.pictures.map(async (pictureId) => {
           const imageResponse = await axios.get(`http://localhost:8080/getPicture?picture=${pictureId}`, { responseType: 'blob' });
@@ -119,21 +116,30 @@ const Travelnote = () => {
         });
         const imageUrls = await Promise.all(imageBlobsPromises);
         setImages(imageUrls); 
+
       } catch (error) {
         console.error('Failed to fetch details:', error);
       }
-
-      const getUserFigure = async () => {
-          const response = await fetch(`http://localhost:8080/getUserFigure?username=${response.data.note.user}`);
-          const blob = await response.blob();
-          setImage({ src: URL.createObjectURL(blob) });
-      
-    };
-  }
+    }
     
     fetchDetails();
 
   }, [id]);
+
+  useEffect(() => {
+    const getUserFigure = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8080/getUserFigure?username=${details.user}`, { responseType: 'blob' });
+        const imageUrl = URL.createObjectURL(res.data);
+        setImage(imageUrl);
+      } catch (error) {
+        console.error('Failed to fetch details:', error);
+      }
+    }
+
+    getUserFigure();
+    
+  },[details]);
 
 
   const getText = (html) =>{
@@ -244,7 +250,7 @@ const Travelnote = () => {
               ]}
             >
               <Meta
-                avatar={<Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=8" />}
+                avatar={<Avatar src={image} />}
                 title={details.title}
                 description={getText(details.content).slice(0,60)}
               />
@@ -268,6 +274,7 @@ const Travelnote = () => {
               minHeight: '70vh',
               borderRadius: borderRadiusLG,
               backgroundColor: '#fefefe',
+              overflowWrap: 'break-word',
               }}>
               <p
                 dangerouslySetInnerHTML={{
