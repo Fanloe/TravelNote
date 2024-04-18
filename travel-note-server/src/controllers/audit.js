@@ -43,11 +43,12 @@ const addAudit = async (req, res) => {
 
     const note = await noteTable.findOne({ _id: new ObjectId(noteId) });
     const beforeStatus = note.status;
-    note["status"] = afterStatus;
+    // note["status"] = afterStatus;
+    // note.push("opinion"  opinion;
     console.log(note);
     const updateNote = await noteTable.updateOne(
       { _id: new ObjectId(noteId) },
-      { $set: note }
+      { $set: { status: afterStatus, opinion: opinion } }
     );
     // const user = await userTable.findOne({ username: req.query.username });
     // const userId = user._id.toString();

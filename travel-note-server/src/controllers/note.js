@@ -251,10 +251,10 @@ const changeNoteStatus = async (req, res) => {
     // const statusOfNotes = 1;
     const changeToStatus = req.query.status;
     const noteId = req.query.note;
-    var newOpinion = null;
-    if ("opinion" in req.query) {
-      newOpinion = req.query.opinion;
-    }
+    // var newOpinion = null;
+    // if ("opinion" in req.query) {
+    //   newOpinion = req.query.opinion;
+    // }
 
     await client.connect();
     const db = client.db(dbName);
@@ -273,7 +273,7 @@ const changeNoteStatus = async (req, res) => {
 
     await noteTable.updateOne(
       { _id: noteId },
-      { $set: { status: changeToStatus, opinion: newOpinion } }
+      { $set: { status: changeToStatus } }
     );
     // await mongoClient.connect();
     client.close();
