@@ -49,19 +49,20 @@ const ManagerLog = () =>{
       try {
         if( value !== ''){
           const response = await axios.get(`http://localhost:8080/getAuditByUser?user=${value}`);
-          const formattedData = response.data.audits.map(audit => ({
+          const log = response.data.audits.reverse();
+          const formattedData = log.map(audit => ({
               key: audit._id,
               auditor: audit.auditor,
               date: new Date(audit.date).toLocaleString(),
-              note: audit.note,
-              actions: calculateAction(audit.beforeStatu, audit.afterStatu),
+              note: audit.title,
+              actions: calculateAction(audit.beforeStatu, audit.afterStatus),
               opinion: audit.opinion,
           }));
           setLogs(formattedData); 
         }else{
           const response = await axios.get(`http://localhost:8080/getAllAudit`);
-
-          const formattedData = response.data.audits.map((audit) => ({
+          const log = response.data.audits.reverse();
+          const formattedData = log.map((audit) => ({
             key: audit._id,
             auditor: audit.auditor,
             date: new Date(audit.date).toLocaleString(),
@@ -81,8 +82,8 @@ const ManagerLog = () =>{
       const fetchLogs = async () => {
         try {
           const response = await axios.get(`http://localhost:8080/getAllAudit`);
-
-          const formattedData = response.data.audits.map((audit) => ({
+          const log = response.data.audits.reverse();
+          const formattedData = log.map((audit) => ({
             key: audit._id,
             auditor: audit.auditor,
             date: new Date(audit.date).toLocaleString(),
