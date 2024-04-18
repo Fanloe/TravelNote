@@ -6,7 +6,7 @@ import React,{useEffect,useState,useRef,useContext} from 'react';
 import { useNavigate,useLocation } from 'react-router-dom';
 import {Editor} from '@tinymce/tinymce-react';
 import { PlusOutlined } from '@ant-design/icons';
-import { Modal, Upload } from 'antd';
+import { Modal, Upload, Button, message, Space } from 'antd';
 import axios from 'axios';
 import { AuthContext } from '../context/authContext';
 
@@ -28,13 +28,15 @@ const Write = () => {
     let navigate = useNavigate();
     let location = useLocation();
     let data = location.state;
-    const [post,setPost] = useState(data || {});
+    const [post,setPost] = useState(data || {title:''});
     const editorRef = useRef('');
 
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
     const [fileList, setFileList] = useState([]);
+
+    const [messageApi, contextHolder] = message.useMessage();//提示信息
     const getPostPicture = async(id) => {
         try{
             let res = {
@@ -59,20 +61,39 @@ const Write = () => {
         for(var i=0;i<post.pictures.length;i++){
             let res = await getPostPicture(post.pictures[i]);
             setFileList(fileList => [...fileList, res]);
-            console.log(res);
+            // console.log(res);
         }
     }
     useEffect(()=>{
         getPostPictures();
-        console.log(post)
+        // console.log(post)
     },[])
 
     //发布游记
     const log = async () => {
-        if(post.title == undefined || editorRef.current == '' || fileList.length == 0){
-            alert('标题、内容、图片均为必须输入项');
+        // 校验
+        if(post.title === ''){
+            messageApi.open({
+                type: 'error',
+                content: '标题不可为空',
+              });
             return;
         }
+        if(editorRef.current.getContent() === ''){
+            messageApi.open({
+                type: 'error',
+                content: '内容不可为空',
+              });
+            return;
+        }
+        if(fileList.length === 0){
+            messageApi.open({
+                type: 'error',
+                content: '图片不可为空',
+              });
+            return;
+        }
+        // 发布
         let formData = new FormData();
         fileList.map(item => {
             formData.append('pictures', item.originFileObj);
@@ -113,7 +134,6 @@ const Write = () => {
         }
         
         // 成功后跳转至我的游记页面
-        // 失败后页面提示
         navigate('/personage')
     }
 
@@ -128,6 +148,17 @@ const Write = () => {
       setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
     };
     const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
+    const beforeUpload = (file) => {
+        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+        if (!isJpgOrPng) {
+            message.error('你只能上传 JPG/PNG 文件!');
+        }
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isLt2M) {
+            message.warning('图像最好小于 2MB!');
+        }
+        return isJpgOrPng && isLt2M;
+    }
     const uploadButton = (
         <button
           style={{
@@ -149,6 +180,7 @@ const Write = () => {
 
     return (
         <div className='write-page'>
+            {contextHolder}
             <div className='write-t'>
                 <Title />
             </div>
@@ -164,6 +196,7 @@ const Write = () => {
                     fileList={fileList}
                     onPreview={handlePreview}
                     onChange={handleChange}
+                    beforeUpload={beforeUpload}
                 >
                     {fileList.length >= 8 ? null : uploadButton}
                 </Upload>

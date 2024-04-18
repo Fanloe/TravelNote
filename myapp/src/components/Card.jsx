@@ -13,13 +13,14 @@ const Card = (props) => {
         let detailData = {
             ...post,
             authorImg:authorImg,
-            img:img
+            img:img,
+            scrollPosition:window.scrollY
         }
         console.log(detailData)
         navigate("/detail/"+post._id,{state:detailData});
     })
     useEffect(()=>{
-        console.log(post)
+        // console.log(post)
         const fetchPicture = async () => {
             await fetch('http://localhost:8080/getPicture?picture='+post.pictures[0])
             .then(response => response.blob())
@@ -39,7 +40,7 @@ const Card = (props) => {
         }
         fetchAuthorImg();
         fetchPicture();
-        console.log(img);
+        // console.log(img);
     },[post])
     return (
         <div className='card' onClick={ToDetail}>

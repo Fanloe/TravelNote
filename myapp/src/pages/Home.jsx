@@ -1,5 +1,5 @@
-// 首页-展示游记瀑布流--
-// 分页加载所有人发布且审核通过的游记
+// 首页-展示游记瀑布流
+// 分页加载所有人发布且审核通过的游记--懒加载
 // 游记卡片展示元素包括游记图片、游记标题、用户头像、用户昵称
 // 点击游记卡片可跳转至当前游记详情页
 
@@ -12,22 +12,22 @@ import axios from 'axios';
 
 const Home = () => {
     let location = useLocation();
-    // const [searchKey, setSearchKey] = useState(location.state.keyword);
     var searchKey = location.state?.keyword || '';
-    console.log(searchKey)
+    var scrollPst = location.state?.scrollPosition || 0;
+    // console.log(searchKey)
     var listCount = 10;//每次划到底部增加10条
     const [page, setPage] = useState(0);//当前页码
     const [posts, setPosts] = useState([]);//所有post
     const [isAtBottom, setIsAtBottom] = useState(false);
     const [lazyposts, setlazyPosts] = useState(posts);//当前渲染在界面上的post
+    const [scrollPosition, setScrollPosition] = useState(scrollPst);
     useEffect(()=>{
         const fetchData = async () => {
             try{
                 let res = null;
-                if(searchKey == '' || searchKey == null) res = await axios.get(`http://localhost:8080/getNotesByStatus?status=1`);//0表示未通过 1表示已通过
+                if(searchKey === '' || searchKey === null) res = await axios.get(`http://localhost:8080/getNotesByStatus?status=1`);//0表示未通过 1表示已通过
                 else res = await axios.get(`http://localhost:8080/searchText?query=${searchKey}`);
-                console.log(res.data);
-                // setSearchKey('')
+                // console.log(res.data);
                 if(res.data.array == null && res.data.result != null) res.data.array = res.data.result;
                 setPosts(res.data.array);
                 setlazyPosts(res.data.array.slice(0, listCount));
@@ -37,6 +37,9 @@ const Home = () => {
             }
         }
         fetchData()
+        // window.scrollTo(0, scrollPosition);
+        // setScrollPosition(window.scrollY);
+        // console.log(scrollPosition)
     },[searchKey])
     // const posts =[
     //     {
@@ -137,9 +140,8 @@ const Home = () => {
     //     }
     // ]
     useEffect(() => {
-        console.log(page)
+        // console.log(page)
         if (isAtBottom && page*listCount<=posts.length) {
-            // 加载更多数据
             // 模拟加载更多数据
             setTimeout(() => {
                 var newPosts = posts.slice(page*listCount,(page+1)*listCount);
@@ -176,7 +178,6 @@ const Home = () => {
             <wc-waterfall gap={4} cols={2}>
                 {
                     lazyposts.map(post=>(
-                        //  key={post.id}
                         <div className='card-container' key={post._id}>
                             <Card post={post}/>
                         </div>

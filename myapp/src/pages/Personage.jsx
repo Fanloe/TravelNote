@@ -3,8 +3,7 @@ import React from 'react';
 import axios from "axios";
 import { useContext,useState,useEffect } from "react";
 import 'wc-waterfall'
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import Edit from '../img/edit.png'
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
 
 function change(state){
@@ -14,18 +13,25 @@ function change(state){
 }
 
 const Personage = () => {
+    const navigate = useNavigate();
     // 个人信息
     const { currentUser } = useContext(AuthContext);
+
     const [userData, setUserData] = useState({
-        id: currentUser._id.slice(0,10),
-        username:currentUser.username
+        id: currentUser?._id.slice(0,10),
+        username:currentUser?.username
     })
     const [avater,setAvater] = useState({src:null});
     const [postData,setPostData] = useState([]);
     const [refrash,setRefrash] = useState(false);
     // 请求个人信息
     useEffect(() => {
-        console.log(currentUser)
+        if(!currentUser) 
+        {   
+            //alert('请先登录');
+            navigate('/login');
+        }
+        // console.log(currentUser)
         const getUserFigure = async () => {//得到用户头像
             try{
                 await fetch('http://localhost:8080/getUserFigure?username='+userData.username)
@@ -53,13 +59,13 @@ const Personage = () => {
         const getUserPosts = async() => {
             try{
                 const res = await axios.get('http://localhost:8080/getUserAllNotes?username='+userData.username);//0表示未通过 1表示已通过
-                console.log(res.data.array);
+                // console.log(res.data.array);
                 for(var i=0;i<res.data.array.length;i++){
                     res.data.array[i].picturesBlob = await getPostPicture(res.data.array[i].pictures[0]);
-                    console.log(res.data.array[i].picturesBlob);
+                    // console.log(res.data.array[i].picturesBlob);
                 }
                 const newData = res.data.array.map((item,index)=>{
-                    console.log(item)
+                    // console.log(item)
                     return{
                         id: item._id,
                         title: item.title,
@@ -68,10 +74,10 @@ const Personage = () => {
                         checkState: change(item.status),
                         img:  item.picturesBlob,
                         pictures: item.pictures,
-                        checkMes:"审核意见：" + change(item.status)//(item.opinion || "审核中···"),
+                        checkMes:"审核意见：" + (change(item.status)=='未通过'?item.opinion:change(item.status))//(item.opinion || "审核中···"),
                     }
                 })
-                console.log(newData);
+                // console.log(newData);
                 setPostData(newData)
             }catch(err){
                 console.log(err);
@@ -124,7 +130,6 @@ const Personage = () => {
     //     },
     // ]
 
-    const navigate = useNavigate();
     const getText = (html) =>{
         const doc = new DOMParser().parseFromString(html, "text/html")
         return doc.body.textContent
@@ -137,7 +142,7 @@ const Personage = () => {
             const file = e.target.files[0];
             const formData = new FormData();
             formData.append('figures',file);
-            console.log(formData)
+            // console.log(formData)
             await fetch('http://localhost:8080/uploadUserFigure?username='+userData.username, {
                 method:"post",
                 body:formData
@@ -151,7 +156,7 @@ const Personage = () => {
 
     const deletePost = async (id) => {
         try{
-            console.log(id);
+            // console.log(id);
             await axios.get('http://localhost:8080/deleteNote?username='+userData.username+'&note='+id)
             setRefrash(!refrash);
             

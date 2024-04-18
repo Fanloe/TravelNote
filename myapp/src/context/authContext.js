@@ -12,7 +12,7 @@ export const AuthContexProvider = ({ children }) => {
     console.log(res);
     setCurrentUser(res.data);
     navigate("/");
-    // window.sessionStorage.setItem('accessToken', res.data.token)
+    //window.sessionStorage.setItem('accessToken', res.data.token)
     //currentUser = {username,password,_id,authority}
   };
 
