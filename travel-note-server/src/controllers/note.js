@@ -24,17 +24,40 @@ const searchText = async (req, res) => {
     const db = client.db(dbName);
     const noteTable = db.collection(noteCollectionName);
 
-    const indexes = noteTable.indexInformation();
-    if ("user_text_title_text_content_text" in indexes)
-      await noteTable.createIndex({
-        user: "text",
-        title: "text",
-        content: "text",
-      });
+    // const indexes = noteTable.indexInformation();
+    // if ("user_text_title_text_content_text" in indexes)
+    //   await noteTable.createIndex({
+    //     user: "text",
+    //     title: "text",
+    //     content: "text",
+    //   });
 
-    const result = await noteTable
-      .find({ $text: { $search: searchQuery } })
+    // const result = await noteTable
+    //   .find({ $text: { $search: searchQuery } })
+    //   .toArray();
+    let result = [];
+    result = await noteTable
+      .find({
+        user: { $regex: searchQuery, $options: "i" },
+      })
       .toArray();
+
+    result = result.concat(
+      await noteTable
+        .find({
+          title: { $regex: searchQuery, $options: "i" },
+        })
+        .toArray()
+    );
+
+    result = result.concat(
+      await noteTable
+        .find({
+          content: { $regex: searchQuery, $options: "i" },
+        })
+        .toArray()
+    );
+
     client.close();
 
     console.log(result);

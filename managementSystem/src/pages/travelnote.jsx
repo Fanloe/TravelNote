@@ -15,6 +15,7 @@ import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/ico
 import { useNavigate, Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useUser } from '../context/userContext.js';
+import DOMPurify from "dompurify";
 
 const { TextArea } = Input;
 const { Meta} = Card;
@@ -135,6 +136,13 @@ const Travelnote = () => {
 
   }, [id]);
 
+
+  const getText = (html) =>{
+    const doc = new DOMParser().parseFromString(html, "text/html")
+    return doc.body.textContent
+  }
+
+  
   let dynamicItems = [];
   if (details) {
     dynamicItems = [
@@ -162,7 +170,7 @@ const Travelnote = () => {
         key: '4',
         label: '游记内容',
         span: 2,
-        children: details.content,
+        children: getText(details.content), 
       },
       
       
@@ -172,6 +180,7 @@ const Travelnote = () => {
   if (!details) {
     return <div>Loading...</div>; 
   }
+
 
   
   return (
@@ -238,7 +247,7 @@ const Travelnote = () => {
               <Meta
                 avatar={<Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=8" />}
                 title={details.title}
-                description={details.content}
+                description={getText(details.content).slice(0,60)}
               />
             
           </Card>

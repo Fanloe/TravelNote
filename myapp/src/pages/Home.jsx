@@ -20,7 +20,7 @@ const Home = () => {
     const [posts, setPosts] = useState([]);//所有post
     const [isAtBottom, setIsAtBottom] = useState(false);
     const [lazyposts, setlazyPosts] = useState(posts);//当前渲染在界面上的post
-    const [scrollPosition, setScrollPosition] = useState(scrollPst);
+    // const [scrollPosition, setScrollPosition] = useState(scrollPst);
     useEffect(()=>{
         const fetchData = async () => {
             try{
@@ -28,7 +28,7 @@ const Home = () => {
                 if(searchKey === '' || searchKey === null) res = await axios.get(`http://localhost:8080/getNotesByStatus?status=1`);//0表示未通过 1表示已通过
                 else res = await axios.get(`http://localhost:8080/searchText?query=${searchKey}`);
                 // console.log(res.data);
-                res.data.array = res.data.array.reverse()
+                res.data.array = res.data.array?.reverse()
                 if(res.data.array == null && res.data.result != null) res.data.array = res.data.result;
                 setPosts(res.data.array);
                 setlazyPosts(res.data.array.slice(0, listCount));
@@ -176,15 +176,18 @@ const Home = () => {
 
     return (
         <div className='home-page'>
-            <wc-waterfall gap={4} cols={2}>
-                {
-                    lazyposts.map(post=>(
-                        <div className='card-container' key={post._id}>
-                            <Card post={post}/>
-                        </div>
-                    ))
-                }
-            </wc-waterfall>
+           { 
+                lazyposts.length===0?<div className='no-post'>暂无游记</div>:
+                <wc-waterfall gap={4} cols={2}>
+                    {
+                        lazyposts.map(post=>(
+                            <div className='card-container' key={post._id}>
+                                <Card post={post}/>
+                            </div>
+                        ))
+                    }
+                </wc-waterfall>
+            }
         </div>
     )
 }

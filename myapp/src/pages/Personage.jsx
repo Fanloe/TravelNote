@@ -184,6 +184,7 @@ const Personage = () => {
             </div>
             <div className='person-posts'>
                 {
+                    postData.length===0?<div className='no-post'>暂无游记</div>:
                     postData.map(post=>(
                         <div className='person-card' key={post.id}>
                             <div className='person-card-top'>
