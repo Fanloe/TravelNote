@@ -41,7 +41,7 @@ const Management = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`http://localhost:8080/getAllNotes`);
-        const notes = response.data.array; 
+        const notes = response.data.array.reverse(); 
         const filteredNotes = notes.filter(note => note.status !== 3);
         // 并行获取所有图片的Blob数据
         const fetchImagesBlobsPromises = filteredNotes.map(async (note) => {
@@ -78,7 +78,7 @@ const Management = () => {
     try {
       if ( value !== ''){
         const response = await axios.get(`http://localhost:8080/searchText?query=${value}`);
-        const notes = response.data.result; 
+        const notes = response.data.result.reverse(); 
         const filteredNotes = notes.filter(note => note.status !== 3);
     
         const fetchImagesBlobsPromises = filteredNotes.map(async (note) => {
@@ -102,7 +102,7 @@ const Management = () => {
         setData(formattedData);
       }else{
         const response = await axios.get(`http://localhost:8080/getAllNotes`);
-        const notes = response.data.array; 
+        const notes = response.data.array.reverse(); 
   
         const fetchImagesBlobsPromises = notes.map(async (note) => {
           const imageResponse = await axios.get(`http://localhost:8080/getPicture?picture=${note.pictures[0]}`, { responseType: 'blob' });

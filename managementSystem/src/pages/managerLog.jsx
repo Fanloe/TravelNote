@@ -100,11 +100,11 @@ const ManagerLog = () =>{
     }, []);
   
     const calculateAction = (beforeStatu, afterStatus) => {
-      if (beforeStatu === 0 && afterStatus === 1) {
+      if (afterStatus === 1) {
         return '通过';
-      }else if (beforeStatu === 0 && afterStatus === 2) {
+      }else if (afterStatus === 2) {
         return '拒绝';
-      }else if (beforeStatu === 0 && afterStatus === 3) {
+      }else if (afterStatus === 3) {
         return '删除';
       }
     };
