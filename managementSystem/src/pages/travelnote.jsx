@@ -117,7 +117,6 @@ const Travelnote = () => {
           const imageUrl = URL.createObjectURL(imageResponse.data);
           return imageUrl;
         });
-  
         const imageUrls = await Promise.all(imageBlobsPromises);
         setImages(imageUrls); 
       } catch (error) {
@@ -131,7 +130,7 @@ const Travelnote = () => {
       
     };
   }
-
+    
     fetchDetails();
 
   }, [id]);
@@ -142,7 +141,7 @@ const Travelnote = () => {
     return doc.body.textContent
   }
 
-  
+
   let dynamicItems = [];
   if (details) {
     dynamicItems = [
@@ -166,12 +165,12 @@ const Travelnote = () => {
         label: '审核状态',
         children: details.status === 0 ? '待审核' : (details.status === 1 ? '已通过' : '未通过'), 
       },
-      {
-        key: '4',
-        label: '游记内容',
-        span: 2,
-        children: getText(details.content), 
-      },
+      // {
+      //   key: '4',
+      //   label: '游记内容',
+      //   span: 2,
+      //   children: getText(details.content), 
+      // },
       
       
     ];
@@ -260,7 +259,22 @@ const Travelnote = () => {
               layout="vertical" 
               items={dynamicItems}
               style={{ marginTop:'10%'}} />
-            
+            <h3>作品内容</h3>
+            <div style={{ 
+              marginBottom:18, 
+              marginTop:18,
+              border:'1px solid #e9e9e9', 
+              padding: '24px', 
+              minHeight: '70vh',
+              borderRadius: borderRadiusLG,
+              backgroundColor: '#fefefe',
+              }}>
+              <p
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(details.content),
+                }}
+              ></p> 
+            </div>
             <h3>审核意见</h3>
             <TextArea 
               rows={6} 
@@ -270,7 +284,7 @@ const Travelnote = () => {
               required={isTextareaRequired}
             />
               
-            <div style={{ display:'flex', gap:'30px'}}>
+            <div style={{ display:'flex', gap:'30px', marginBottom:18}}>
               <Button type="primary" onClick={() => handleAction('approve')}>
                 通过
               </Button>

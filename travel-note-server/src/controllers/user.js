@@ -12,8 +12,10 @@ const GridFSBucket = require("mongodb").GridFSBucket;
 
 // Database Name
 const dbName = dbConfig.mydb;
-const collectionName = dbConfig.user;
+const userCollectionName = dbConfig.user;
 const noteCollectionName = dbConfig.note;
+const auditCollectionName = dbConfig.audit;
+const pictureCollectionName = dbConfig.picBucket;
 
 /**
  * 查询用户名返回用户
@@ -21,7 +23,7 @@ const noteCollectionName = dbConfig.note;
 // const queryUser = async (name) => {
 //   await client.connect();
 //   const db = client.db(dbName);
-//   const collection = db.collection(collectionName);
+//   const collection = db.collection(userCollectionName);
 //   const origin = await collection.findOne({ name });
 //   client.close();
 //   return origin;
@@ -41,7 +43,7 @@ const register = async (req, res) => {
   const authority = query.authority;
   await client.connect();
   const db = client.db(dbName);
-  const collection = db.collection(collectionName);
+  const collection = db.collection(userCollectionName);
   const origin = await collection.findOne({ username });
   console.log(origin);
   // Use connect method to connect to the server
@@ -66,6 +68,45 @@ const register = async (req, res) => {
     });
   }
 };
+const countAll = async (req, res) => {
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const userTable = db.collection(userCollectionName);
+    const noteTable = db.collection(noteCollectionName);
+    const auditTable = db.collection(auditCollectionName);
+    const pictureTable = db.collection(pictureCollectionName + ".files");
+
+    const noteNum = await noteTable.count();
+    const auditNum = await auditTable.count();
+    console.log(noteNum + "\n" + auditNum);
+
+    const normalUser = await userTable.find({ authority: "0" }).count();
+    const auditorNum = await userTable
+      .find({ authority: { $in: ["1", "2"] } })
+      .count();
+    const pictureNum = await pictureTable.count();
+
+    client.close();
+
+    return res.status(200).send({
+      message: "Count datas Successs.",
+      data: {
+        noteNum: noteNum,
+        auditNum: auditNum,
+        normalUser: normalUser,
+        auditorNum: auditorNum,
+        pictureNum: pictureNum,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send({
+      message: "Count datas error!",
+      err: error,
+    });
+  }
+};
 /**
  * 上传用户figure
  * @param {password} req
@@ -84,7 +125,7 @@ const uploadUserFigure = async (req, res) => {
     console.log(figureId.toString());
     await client.connect();
     const db = client.db(dbName);
-    const collection = db.collection(collectionName);
+    const collection = db.collection(userCollectionName);
     const user = await collection.findOne({ username });
     await collection.updateOne(
       { _id: user._id },
@@ -143,7 +184,7 @@ const getUserFigure = async (req, res) => {
 
     await client.connect();
     const db = client.db(dbName);
-    const collection = db.collection(collectionName);
+    const collection = db.collection(userCollectionName);
     const user = await collection.findOne({ username });
     console.log(user);
     const figureId = user.figure;
@@ -225,7 +266,7 @@ const getUserAllNotes = async (req, res) => {
 
     await client.connect();
     const db = client.db(dbName);
-    const collection = db.collection(collectionName);
+    const collection = db.collection(userCollectionName);
     const user = await collection.findOne({ username });
     console.log(user);
     const userId = user._id.toString();
@@ -256,7 +297,7 @@ const getUserAllNotes = async (req, res) => {
 const deleteMany = async () => {
   await client.connect();
   const db = client.db(dbName);
-  const collection = db.collection(collectionName);
+  const collection = db.collection(userCollectionName);
   await collection.deleteMany();
   client.close();
   return "done.";
@@ -269,7 +310,7 @@ const deleteMany = async () => {
 const getAllUser = async (req, res) => {
   await client.connect();
   const db = client.db(dbName);
-  const collection = db.collection(collectionName);
+  const collection = db.collection(userCollectionName);
   const array = await collection.find().toArray();
   client.close();
   return res.json(array);
@@ -285,7 +326,7 @@ const verifyNormalUser = async (req, res) => {
   console.log(username);
   await client.connect();
   const db = client.db(dbName);
-  const collection = db.collection(collectionName);
+  const collection = db.collection(userCollectionName);
   const user = await collection.findOne({ username });
   console.log(user);
   console.log(username);
@@ -311,7 +352,7 @@ const verifyAdministrator = async (req, res) => {
 
   await client.connect();
   const db = client.db(dbName);
-  const collection = db.collection(collectionName);
+  const collection = db.collection(userCollectionName);
   const user = await collection.findOne({ username });
   console.log(user);
   client.close();
@@ -343,4 +384,5 @@ module.exports = {
   getUserFigure,
   getUserAllNotes,
   getPictureById,
+  countAll,
 };
