@@ -6,7 +6,7 @@ import React,{useEffect,useState,useRef,useContext} from 'react';
 import { useNavigate,useLocation } from 'react-router-dom';
 import {Editor} from '@tinymce/tinymce-react';
 import { PlusOutlined } from '@ant-design/icons';
-import { Modal, Upload, Button, message, Space } from 'antd';
+import { Modal, Upload, message } from 'antd';
 import axios from 'axios';
 import { AuthContext } from '../context/authContext';
 

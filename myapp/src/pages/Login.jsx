@@ -5,7 +5,7 @@ import React from 'react';
 import { useContext,useState } from "react";
 import { Link,useNavigate } from 'react-router-dom';
 import { AuthContext } from "../context/authContext";
-
+import { message } from 'antd';
 import Title from '../components/Title';
 
 const Login = () => {
@@ -13,7 +13,7 @@ const Login = () => {
         username: "",
         password: "",
     });
-    const [err, setError] = useState(null);
+    // const [err, setError] = useState(null);
     let navigate = useNavigate();
     const { login } = useContext(AuthContext);
 
@@ -23,13 +23,16 @@ const Login = () => {
     
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if(!inputs.username || !inputs.password){
+            message.error('请输入用户名和密码');
+            return;
+        }
         try {
             const res = await axios.get('http://localhost:8080/verifyNormalUser?username='+inputs.username+'&password='+inputs.password);
             console.log(res.data);
             login(res.data,navigate);
         } catch (err) {
-            //err.response.data
-            setError("登录失败");
+            message.error('登陆失败');
         }
     };
     return (
@@ -53,7 +56,7 @@ const Login = () => {
                     onChange={handleChange}
                     />
                     <button onClick={handleSubmit}>Login</button>
-                    {err && <p>{err}</p>}
+                    {/* {err && <p>{err}</p>} */}
                     <span>
                         没有账号? <Link to="/register">注册</Link>
                     </span>

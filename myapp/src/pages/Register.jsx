@@ -4,6 +4,7 @@
 import React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { message } from 'antd';
 import axios from "axios";
 
 import Title from '../components/Title';
@@ -14,7 +15,6 @@ const Register = () => {
     password: "",
     authority:0
   });
-  const [err, setError] = useState(null);
 
   const navigate = useNavigate();
 
@@ -24,10 +24,14 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if(!inputs.username || !inputs.password){
+        message.error('请输入用户名和密码');
+        return;
+    }
     try {
       await axios.get(`http://localhost:8080/register?username=${inputs.username}&password=${inputs.password}&authority=${inputs.authority}`);
     } catch (err) {
-      setError("注册失败");
+      message.error('注册失败');
     }
     navigate("/login");
   };
@@ -53,7 +57,7 @@ const Register = () => {
             onChange={handleChange}
             />
             <button onClick={handleSubmit}>Register</button>
-            {err && <p>{err}</p>}
+            {/* {err && <p>{err}</p>} */}
             <span>
             已有帐号? <Link to="/login">登录</Link>
             </span>

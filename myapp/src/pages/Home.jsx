@@ -28,6 +28,7 @@ const Home = () => {
                 if(searchKey === '' || searchKey === null) res = await axios.get(`http://localhost:8080/getNotesByStatus?status=1`);//0表示未通过 1表示已通过
                 else res = await axios.get(`http://localhost:8080/searchText?query=${searchKey}`);
                 // console.log(res.data);
+                res.data.array = res.data.array.reverse()
                 if(res.data.array == null && res.data.result != null) res.data.array = res.data.result;
                 setPosts(res.data.array);
                 setlazyPosts(res.data.array.slice(0, listCount));

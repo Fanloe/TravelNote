@@ -64,6 +64,7 @@ const Personage = () => {
                     res.data.array[i].picturesBlob = await getPostPicture(res.data.array[i].pictures[0]);
                     // console.log(res.data.array[i].picturesBlob);
                 }
+                res.data.array = res.data.array.reverse()
                 const newData = res.data.array.map((item,index)=>{
                     // console.log(item)
                     return{
