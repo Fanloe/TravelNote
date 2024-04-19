@@ -45,6 +45,7 @@ const register = async (req, res) => {
   const db = client.db(dbName);
   const collection = db.collection(userCollectionName);
   const origin = await collection.findOne({ username });
+  const figure = "6616929bfd32b14f7e4f0c8d";
   console.log(origin);
   // Use connect method to connect to the server
   // console.log("test");
@@ -55,7 +56,7 @@ const register = async (req, res) => {
       error: "User already exists",
     });
   } else {
-    await collection.insertOne({ username, password, authority });
+    await collection.insertOne({ username, password, authority, figure });
     client.close();
     res.status(200).json({
       message: "Sign-up success",
@@ -63,7 +64,7 @@ const register = async (req, res) => {
         name: username,
         password: password,
         authority: authority,
-        figure: "66131f250bca6d9495481d70",
+        figure: "6616929bfd32b14f7e4f0c8d",
       },
     });
   }
